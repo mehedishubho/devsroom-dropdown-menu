@@ -26,7 +26,7 @@ Features include:
 * Admin-only custom JavaScript execution support
 * Keyboard navigation and ARIA attributes
 * Improved icon rendering compatibility for Elementor icon payloads
-* WooCommerce Product Image widget with configurable thumbnail size and position
+* WooCommerce Product Image widget with configurable thumbnail size/position and optional thumbnail slider controls
 
 == Installation ==
 

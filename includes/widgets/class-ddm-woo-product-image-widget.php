@@ -152,6 +152,139 @@ class DDM_Woo_Product_Image_Widget extends Widget_Base {
 			)
 		);
 
+		$this->add_control(
+			'thumb_mode',
+			array(
+				'label'   => __( 'Thumbnail Display', 'devsroom-dropdown-menu' ),
+				'type'    => Controls_Manager::SELECT,
+				'options' => array(
+					'grid'   => __( 'Grid', 'devsroom-dropdown-menu' ),
+					'slider' => __( 'Slider', 'devsroom-dropdown-menu' ),
+				),
+				'default' => 'grid',
+			)
+		);
+
+		$this->add_control(
+			'thumb_slider_slides',
+			array(
+				'label'      => __( 'Visible Thumbnails', 'devsroom-dropdown-menu' ),
+				'type'       => Controls_Manager::NUMBER,
+				'min'        => 1,
+				'max'        => 10,
+				'step'       => 1,
+				'default'    => 4,
+				'condition'  => array(
+					'show_thumbnails' => 'yes',
+					'thumb_mode'      => 'slider',
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .ddm-woo-product-image' => '--ddm-thumb-slides: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'thumb_slider_show_arrows',
+			array(
+				'label'        => __( 'Show Navigation Arrows', 'devsroom-dropdown-menu' ),
+				'type'         => Controls_Manager::SWITCHER,
+				'label_on'     => __( 'Yes', 'devsroom-dropdown-menu' ),
+				'label_off'    => __( 'No', 'devsroom-dropdown-menu' ),
+				'return_value' => 'yes',
+				'default'      => 'yes',
+				'condition'    => array(
+					'show_thumbnails' => 'yes',
+					'thumb_mode'      => 'slider',
+				),
+			)
+		);
+
+		$this->add_control(
+			'thumb_slider_autoplay',
+			array(
+				'label'        => __( 'Autoplay', 'devsroom-dropdown-menu' ),
+				'type'         => Controls_Manager::SWITCHER,
+				'label_on'     => __( 'Yes', 'devsroom-dropdown-menu' ),
+				'label_off'    => __( 'No', 'devsroom-dropdown-menu' ),
+				'return_value' => 'yes',
+				'default'      => '',
+				'condition'    => array(
+					'show_thumbnails' => 'yes',
+					'thumb_mode'      => 'slider',
+				),
+			)
+		);
+
+		$this->add_control(
+			'thumb_slider_autoplay_delay',
+			array(
+				'label'      => __( 'Autoplay Delay (ms)', 'devsroom-dropdown-menu' ),
+				'type'       => Controls_Manager::NUMBER,
+				'min'        => 1000,
+				'max'        => 20000,
+				'step'       => 100,
+				'default'    => 3000,
+				'condition'  => array(
+					'show_thumbnails'      => 'yes',
+					'thumb_mode'           => 'slider',
+					'thumb_slider_autoplay' => 'yes',
+				),
+			)
+		);
+
+		$this->add_control(
+			'thumb_slider_speed',
+			array(
+				'label'      => __( 'Slide Speed (ms)', 'devsroom-dropdown-menu' ),
+				'type'       => Controls_Manager::NUMBER,
+				'min'        => 100,
+				'max'        => 3000,
+				'step'       => 50,
+				'default'    => 300,
+				'condition'  => array(
+					'show_thumbnails' => 'yes',
+					'thumb_mode'      => 'slider',
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .ddm-woo-product-image' => '--ddm-thumb-slider-speed: {{VALUE}}ms;',
+				),
+			)
+		);
+
+		$this->add_control(
+			'thumb_slider_loop',
+			array(
+				'label'        => __( 'Loop Slider', 'devsroom-dropdown-menu' ),
+				'type'         => Controls_Manager::SWITCHER,
+				'label_on'     => __( 'Yes', 'devsroom-dropdown-menu' ),
+				'label_off'    => __( 'No', 'devsroom-dropdown-menu' ),
+				'return_value' => 'yes',
+				'default'      => 'yes',
+				'condition'    => array(
+					'show_thumbnails' => 'yes',
+					'thumb_mode'      => 'slider',
+				),
+			)
+		);
+
+		$this->add_control(
+			'thumb_slider_pause_on_hover',
+			array(
+				'label'        => __( 'Pause On Hover', 'devsroom-dropdown-menu' ),
+				'type'         => Controls_Manager::SWITCHER,
+				'label_on'     => __( 'Yes', 'devsroom-dropdown-menu' ),
+				'label_off'    => __( 'No', 'devsroom-dropdown-menu' ),
+				'return_value' => 'yes',
+				'default'      => 'yes',
+				'condition'    => array(
+					'show_thumbnails'      => 'yes',
+					'thumb_mode'           => 'slider',
+					'thumb_slider_autoplay' => 'yes',
+				),
+			)
+		);
+
 		$this->add_responsive_control(
 			'thumb_size',
 			array(
@@ -324,6 +457,15 @@ class DDM_Woo_Product_Image_Widget extends Widget_Base {
 		$allowed         = array( 'bottom', 'top', 'left', 'right' );
 		$thumb_position  = in_array( $position, $allowed, true ) ? $position : 'bottom';
 		$show_thumbnails = 'yes' === ( $settings['show_thumbnails'] ?? 'yes' );
+		$thumb_mode      = in_array( $settings['thumb_mode'] ?? 'grid', array( 'grid', 'slider' ), true ) ? $settings['thumb_mode'] : 'grid';
+		$is_slider_mode  = 'slider' === $thumb_mode;
+		$slider_axis     = in_array( $thumb_position, array( 'left', 'right' ), true ) ? 'y' : 'x';
+		$slider_slides   = max( 1, (int) ( $settings['thumb_slider_slides'] ?? 4 ) );
+		$slider_autoplay = $this->is_switcher_enabled( $settings['thumb_slider_autoplay'] ?? '' );
+		$slider_delay    = max( 1000, (int) ( $settings['thumb_slider_autoplay_delay'] ?? 3000 ) );
+		$slider_loop     = $this->is_switcher_enabled( $settings['thumb_slider_loop'] ?? 'yes' );
+		$slider_pause    = $this->is_switcher_enabled( $settings['thumb_slider_pause_on_hover'] ?? 'yes' );
+		$show_arrows     = $this->is_switcher_enabled( $settings['thumb_slider_show_arrows'] ?? 'yes' );
 
 		$main_image_id = (int) $image_ids[0];
 		$main_src      = wp_get_attachment_image_url( $main_image_id, 'woocommerce_single' );
@@ -367,17 +509,38 @@ class DDM_Woo_Product_Image_Widget extends Widget_Base {
 		echo '</div>';
 
 		if ( $show_thumbnails && count( $image_ids ) > 1 ) {
-			echo '<div class="ddm-woo-product-image__thumbs" role="tablist" aria-label="' . esc_attr__( 'Product gallery thumbnails', 'devsroom-dropdown-menu' ) . '">';
+			$thumbs_class = $is_slider_mode ? 'ddm-woo-product-image__thumbs ddm-woo-product-image__thumbs--slider' : 'ddm-woo-product-image__thumbs';
+			echo '<div class="' . esc_attr( $thumbs_class ) . '" role="tablist" aria-label="' . esc_attr__( 'Product gallery thumbnails', 'devsroom-dropdown-menu' ) . '"';
 
-			foreach ( $image_ids as $index => $image_id ) {
+			if ( $is_slider_mode ) {
+				echo ' data-slider="yes"';
+				echo ' data-axis="' . esc_attr( $slider_axis ) . '"';
+				echo ' data-slides="' . esc_attr( (string) $slider_slides ) . '"';
+				echo ' data-autoplay="' . esc_attr( $slider_autoplay ? 'yes' : 'no' ) . '"';
+				echo ' data-autoplay-delay="' . esc_attr( (string) $slider_delay ) . '"';
+				echo ' data-loop="' . esc_attr( $slider_loop ? 'yes' : 'no' ) . '"';
+				echo ' data-pause-hover="' . esc_attr( $slider_pause ? 'yes' : 'no' ) . '"';
+			}
+
+			echo '>';
+
+			if ( $is_slider_mode && $show_arrows ) {
+				echo '<button type="button" class="ddm-woo-product-image__nav ddm-woo-product-image__nav--prev" aria-label="' . esc_attr__( 'Previous thumbnails', 'devsroom-dropdown-menu' ) . '">&#10094;</button>';
+			}
+
+			if ( $is_slider_mode ) {
+				echo '<div class="ddm-woo-product-image__thumbs-viewport">';
+				echo '<div class="ddm-woo-product-image__thumbs-track">';
+			}
+
+			$thumb_index = 0;
+			foreach ( $image_ids as $image_id ) {
 				$image_id     = (int) $image_id;
 				$thumb_src    = wp_get_attachment_image_url( $image_id, 'woocommerce_thumbnail' );
 				$full_src     = wp_get_attachment_image_url( $image_id, 'woocommerce_single' );
 				$full_srcset  = wp_get_attachment_image_srcset( $image_id, 'woocommerce_single' );
 				$full_sizes   = wp_get_attachment_image_sizes( $image_id, 'woocommerce_single' );
 				$image_alt    = get_post_meta( $image_id, '_wp_attachment_image_alt', true );
-				$is_active    = 0 === $index;
-				$button_class = $is_active ? 'ddm-woo-product-image__thumb is-active' : 'ddm-woo-product-image__thumb';
 
 				if ( '' === $image_alt ) {
 					$image_alt = $product->get_name();
@@ -390,6 +553,9 @@ class DDM_Woo_Product_Image_Widget extends Widget_Base {
 				if ( ! $thumb_src ) {
 					$thumb_src = $full_src;
 				}
+
+				$is_active    = 0 === $thumb_index;
+				$button_class = $is_active ? 'ddm-woo-product-image__thumb is-active' : 'ddm-woo-product-image__thumb';
 
 				echo '<button type="button" class="' . esc_attr( $button_class ) . '" data-full-src="' . esc_url( $full_src ) . '"';
 
@@ -404,6 +570,16 @@ class DDM_Woo_Product_Image_Widget extends Widget_Base {
 				echo ' data-full-alt="' . esc_attr( $image_alt ) . '" aria-label="' . esc_attr__( 'Show image', 'devsroom-dropdown-menu' ) . '">';
 				echo '<img src="' . esc_url( $thumb_src ) . '" alt="' . esc_attr( $image_alt ) . '">';
 				echo '</button>';
+				$thumb_index++;
+			}
+
+			if ( $is_slider_mode ) {
+				echo '</div>';
+				echo '</div>';
+			}
+
+			if ( $is_slider_mode && $show_arrows ) {
+				echo '<button type="button" class="ddm-woo-product-image__nav ddm-woo-product-image__nav--next" aria-label="' . esc_attr__( 'Next thumbnails', 'devsroom-dropdown-menu' ) . '">&#10095;</button>';
 			}
 
 			echo '</div>';
@@ -524,5 +700,15 @@ class DDM_Woo_Product_Image_Widget extends Widget_Base {
 	 */
 	private function is_edit_mode() {
 		return class_exists( '\Elementor\Plugin' ) && \Elementor\Plugin::$instance->editor->is_edit_mode();
+	}
+
+	/**
+	 * Determines whether switcher value is enabled.
+	 *
+	 * @param mixed $value Switcher value.
+	 * @return bool
+	 */
+	private function is_switcher_enabled( $value ) {
+		return 'yes' === $value;
 	}
 }
