@@ -1,0 +1,101 @@
+.ddm-woo-product-image {
+	--ddm-thumb-size: 72px;
+	--ddm-thumb-gap: 10px;
+	display: flex;
+	gap: var(--ddm-thumb-gap);
+	width: 100%;
+}
+
+.ddm-woo-product-image[data-thumb-position="bottom"] {
+	flex-direction: column;
+}
+
+.ddm-woo-product-image[data-thumb-position="top"] {
+	flex-direction: column-reverse;
+}
+
+.ddm-woo-product-image[data-thumb-position="left"] {
+	flex-direction: row;
+	align-items: flex-start;
+}
+
+.ddm-woo-product-image[data-thumb-position="right"] {
+	flex-direction: row-reverse;
+	align-items: flex-start;
+}
+
+.ddm-woo-product-image__main {
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+.ddm-woo-product-image__main-image {
+	display: block;
+	width: 100%;
+	height: auto;
+	object-fit: contain;
+}
+
+.ddm-woo-product-image__thumbs {
+	display: flex;
+	gap: var(--ddm-thumb-gap);
+}
+
+.ddm-woo-product-image[data-thumb-position="bottom"] .ddm-woo-product-image__thumbs,
+.ddm-woo-product-image[data-thumb-position="top"] .ddm-woo-product-image__thumbs {
+	flex-direction: row;
+	flex-wrap: wrap;
+}
+
+.ddm-woo-product-image[data-thumb-position="left"] .ddm-woo-product-image__thumbs,
+.ddm-woo-product-image[data-thumb-position="right"] .ddm-woo-product-image__thumbs {
+	flex-direction: column;
+}
+
+.ddm-woo-product-image__thumb {
+	width: var(--ddm-thumb-size);
+	height: var(--ddm-thumb-size);
+	padding: 0;
+	border: 1px solid #d1d5db;
+	background: transparent;
+	cursor: pointer;
+	overflow: hidden;
+	transition: border-color 180ms ease, opacity 180ms ease;
+}
+
+.ddm-woo-product-image__thumb:hover,
+.ddm-woo-product-image__thumb:focus-visible {
+	border-color: #374151;
+}
+
+.ddm-woo-product-image__thumb.is-active {
+	border-color: #111827;
+}
+
+.ddm-woo-product-image__thumb img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.ddm-woo-product-image__notice {
+	padding: 12px;
+	border: 1px dashed #d1d5db;
+	color: #374151;
+	font-size: 13px;
+}
+
+@media (max-width: 767px) {
+	.ddm-woo-product-image[data-thumb-position="left"],
+	.ddm-woo-product-image[data-thumb-position="right"] {
+		flex-direction: column;
+	}
+
+	.ddm-woo-product-image[data-thumb-position="left"] .ddm-woo-product-image__thumbs,
+	.ddm-woo-product-image[data-thumb-position="right"] .ddm-woo-product-image__thumbs {
+		flex-direction: row;
+		flex-wrap: wrap;
+	}
+}
+

@@ -8,11 +8,11 @@ License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Tags: elementor, dropdown, menu, hamburger, navigation
 
-A customizable Elementor dropdown menu widget with a hamburger trigger, repeater items, and accessible keyboard navigation.
+A customizable Elementor widgets pack including a dropdown menu and WooCommerce product image gallery.
 
 == Description ==
 
-Devsroom Dropdown Menu adds an Elementor widget for building a compact hamburger-driven dropdown menu.
+Devsroom Dropdown Menu adds Elementor widgets for navigation and WooCommerce product media display.
 
 Features include:
 
@@ -26,6 +26,7 @@ Features include:
 * Admin-only custom JavaScript execution support
 * Keyboard navigation and ARIA attributes
 * Improved icon rendering compatibility for Elementor icon payloads
+* WooCommerce Product Image widget with configurable thumbnail size and position
 
 == Installation ==
 

@@ -88,8 +88,10 @@ class DDM_Elementor_Integration {
 	 */
 	public function register_widgets( $widgets_manager ) {
 		require_once __DIR__ . '/widgets/class-ddm-dropdown-menu-widget.php';
+		require_once __DIR__ . '/widgets/class-ddm-woo-product-image-widget.php';
 
 		$widgets_manager->register( new \Devsroom\DropdownMenu\Widgets\DDM_Dropdown_Menu_Widget() );
+		$widgets_manager->register( new \Devsroom\DropdownMenu\Widgets\DDM_Woo_Product_Image_Widget() );
 	}
 }
 
