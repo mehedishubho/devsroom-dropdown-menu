@@ -8,7 +8,10 @@
 namespace Devsroom\DropdownMenu\Widgets;
 
 use Elementor\Controls_Manager;
+use Elementor\Group_Control_Background;
+use Elementor\Group_Control_Border;
 use Elementor\Group_Control_Typography;
+use Elementor\Icons_Manager;
 use Elementor\Widget_Base;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -66,6 +69,8 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 		$this->register_add_to_cart_controls();
 		$this->register_custom_action_controls();
 		$this->register_layout_controls();
+		$this->register_container_style_controls();
+		$this->register_buttons_common_style_controls();
 		$this->register_quantity_style_controls();
 		$this->register_add_to_cart_style_controls();
 		$this->register_custom_button_style_controls();
@@ -114,12 +119,60 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 		$this->add_control(
 			'quantity_label',
 			array(
-				'label'     => __( 'Quantity Label', 'devsroom-dropdown-menu' ),
+				'label'     => __( 'Label', 'devsroom-dropdown-menu' ),
 				'type'      => Controls_Manager::TEXT,
 				'default'   => __( 'Qty:', 'devsroom-dropdown-menu' ),
 				'condition' => array(
 					'show_quantity'       => 'yes',
 					'show_quantity_label' => 'yes',
+				),
+			)
+		);
+
+		$this->add_control(
+			'quantity_label_position',
+			array(
+				'label'     => __( 'Label Position', 'devsroom-dropdown-menu' ),
+				'type'      => Controls_Manager::SELECT,
+				'options'   => array(
+					'left'  => __( 'Left', 'devsroom-dropdown-menu' ),
+					'top'   => __( 'Top', 'devsroom-dropdown-menu' ),
+					'right' => __( 'Right', 'devsroom-dropdown-menu' ),
+				),
+				'default'   => 'left',
+				'condition' => array(
+					'show_quantity'       => 'yes',
+					'show_quantity_label' => 'yes',
+				),
+			)
+		);
+
+		$this->add_control(
+			'minus_icon',
+			array(
+				'label'     => __( 'Minus Icon', 'devsroom-dropdown-menu' ),
+				'type'      => Controls_Manager::ICONS,
+				'default'   => array(
+					'value'   => 'fas fa-minus',
+					'library' => 'fa-solid',
+				),
+				'condition' => array(
+					'show_quantity' => 'yes',
+				),
+			)
+		);
+
+		$this->add_control(
+			'plus_icon',
+			array(
+				'label'     => __( 'Plus Icon', 'devsroom-dropdown-menu' ),
+				'type'      => Controls_Manager::ICONS,
+				'default'   => array(
+					'value'   => 'fas fa-plus',
+					'library' => 'fa-solid',
+				),
+				'condition' => array(
+					'show_quantity' => 'yes',
 				),
 			)
 		);
@@ -167,6 +220,20 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 			)
 		);
 
+		$this->add_control(
+			'max_limit_notice',
+			array(
+				'label'     => __( 'Max Limit Notice', 'devsroom-dropdown-menu' ),
+				'type'      => Controls_Manager::TEXTAREA,
+				'rows'      => 3,
+				'default'   => __( 'You cannot order more than {max} items.', 'devsroom-dropdown-menu' ),
+				'condition' => array(
+					'show_quantity'    => 'yes',
+					'enable_max_limit' => 'yes',
+				),
+			)
+		);
+
 		$this->end_controls_section();
 	}
 
@@ -189,29 +256,6 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 				'label'   => __( 'Button Text', 'devsroom-dropdown-menu' ),
 				'type'    => Controls_Manager::TEXT,
 				'default' => __( 'Add to Cart', 'devsroom-dropdown-menu' ),
-			)
-		);
-
-		$this->add_responsive_control(
-			'add_to_cart_width',
-			array(
-				'label'      => __( 'Button Width', 'devsroom-dropdown-menu' ),
-				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( '%', 'px' ),
-				'range'      => array(
-					'%'  => array(
-						'min' => 10,
-						'max' => 100,
-					),
-					'px' => array(
-						'min' => 80,
-						'max' => 700,
-					),
-				),
-				'selectors'  => array(
-					'{{WRAPPER}} .ddm-apa-add-to-cart'                    => 'width: {{SIZE}}{{UNIT}};',
-					'{{WRAPPER}} .ddm-apa-cart-area .single_add_to_cart_button' => 'width: {{SIZE}}{{UNIT}};',
-				),
 			)
 		);
 
@@ -293,31 +337,6 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 				'default'   => __( 'Buy via WhatsApp', 'devsroom-dropdown-menu' ),
 				'condition' => array(
 					'show_custom_button' => 'yes',
-				),
-			)
-		);
-
-		$this->add_responsive_control(
-			'custom_button_width',
-			array(
-				'label'      => __( 'Button Width', 'devsroom-dropdown-menu' ),
-				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( '%', 'px' ),
-				'range'      => array(
-					'%'  => array(
-						'min' => 10,
-						'max' => 100,
-					),
-					'px' => array(
-						'min' => 80,
-						'max' => 700,
-					),
-				),
-				'condition'  => array(
-					'show_custom_button' => 'yes',
-				),
-				'selectors'  => array(
-					'{{WRAPPER}} .ddm-apa-custom-action-btn' => 'width: {{SIZE}}{{UNIT}};',
 				),
 			)
 		);
@@ -445,6 +464,131 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 	}
 
 	/**
+	 * Registers container style controls.
+	 *
+	 * @return void
+	 */
+	private function register_container_style_controls() {
+		$this->start_controls_section(
+			'section_style_container',
+			array(
+				'label' => __( 'Container', 'devsroom-dropdown-menu' ),
+				'tab'   => Controls_Manager::TAB_STYLE,
+			)
+		);
+
+		$this->add_responsive_control(
+			'container_padding',
+			array(
+				'label'      => __( 'Padding', 'devsroom-dropdown-menu' ),
+				'type'       => Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px', 'em', '%' ),
+				'selectors'  => array(
+					'{{WRAPPER}} .ddm-apa' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Background::get_type(),
+			array(
+				'name'     => 'container_background',
+				'types'    => array( 'classic', 'gradient' ),
+				'selector' => '{{WRAPPER}} .ddm-apa',
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Border::get_type(),
+			array(
+				'name'     => 'container_border',
+				'selector' => '{{WRAPPER}} .ddm-apa',
+			)
+		);
+
+		$this->add_responsive_control(
+			'container_border_radius',
+			array(
+				'label'      => __( 'Border Radius', 'devsroom-dropdown-menu' ),
+				'type'       => Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px', '%' ),
+				'selectors'  => array(
+					'{{WRAPPER}} .ddm-apa' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->end_controls_section();
+	}
+
+	/**
+	 * Registers common button style controls.
+	 *
+	 * @return void
+	 */
+	private function register_buttons_common_style_controls() {
+		$this->start_controls_section(
+			'section_style_buttons_common',
+			array(
+				'label' => __( 'Buttons Common', 'devsroom-dropdown-menu' ),
+				'tab'   => Controls_Manager::TAB_STYLE,
+			)
+		);
+
+		$this->add_responsive_control(
+			'buttons_global_padding',
+			array(
+				'label'      => __( 'Global Padding', 'devsroom-dropdown-menu' ),
+				'type'       => Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px', 'em', '%' ),
+				'selectors'  => array(
+					'{{WRAPPER}} .ddm-apa button, {{WRAPPER}} .ddm-apa .button, {{WRAPPER}} .ddm-apa-cart-area .single_add_to_cart_button' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'buttons_global_margin',
+			array(
+				'label'      => __( 'Global Margin', 'devsroom-dropdown-menu' ),
+				'type'       => Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px', 'em', '%' ),
+				'selectors'  => array(
+					'{{WRAPPER}} .ddm-apa button, {{WRAPPER}} .ddm-apa .button, {{WRAPPER}} .ddm-apa-cart-area .single_add_to_cart_button' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'buttons_global_gap',
+			array(
+				'label'      => __( 'Button Gap', 'devsroom-dropdown-menu' ),
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px', 'em', 'rem' ),
+				'range'      => array(
+					'px'  => array(
+						'min' => 0,
+						'max' => 80,
+					),
+					'em'  => array(
+						'min' => 0,
+						'max' => 5,
+					),
+					'rem' => array(
+						'min' => 0,
+						'max' => 5,
+					),
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .ddm-apa' => '--ddm-apa-button-gap: {{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->end_controls_section();
+	}
+
+	/**
 	 * Registers quantity style controls.
 	 *
 	 * @return void
@@ -478,6 +622,123 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 			)
 		);
 
+		$this->add_responsive_control(
+			'quantity_label_margin_bottom',
+			array(
+				'label'      => __( 'Label Margin Bottom', 'devsroom-dropdown-menu' ),
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px', 'em', 'rem' ),
+				'range'      => array(
+					'px'  => array(
+						'min' => 0,
+						'max' => 80,
+					),
+					'em'  => array(
+						'min' => 0,
+						'max' => 5,
+					),
+					'rem' => array(
+						'min' => 0,
+						'max' => 5,
+					),
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .ddm-apa-qty-wrap--label-top .ddm-apa-qty-label' => 'margin-bottom: {{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'quantity_label_gap',
+			array(
+				'label'      => __( 'Label Gap', 'devsroom-dropdown-menu' ),
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px', 'em', 'rem' ),
+				'range'      => array(
+					'px'  => array(
+						'min' => 0,
+						'max' => 80,
+					),
+					'em'  => array(
+						'min' => 0,
+						'max' => 5,
+					),
+					'rem' => array(
+						'min' => 0,
+						'max' => 5,
+					),
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .ddm-apa' => '--ddm-apa-qty-label-gap: {{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'quantity_inner_gap',
+			array(
+				'label'      => __( 'Inner Gap', 'devsroom-dropdown-menu' ),
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px', 'em', 'rem' ),
+				'range'      => array(
+					'px'  => array(
+						'min' => 0,
+						'max' => 40,
+					),
+					'em'  => array(
+						'min' => 0,
+						'max' => 3,
+					),
+					'rem' => array(
+						'min' => 0,
+						'max' => 3,
+					),
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .ddm-apa' => '--ddm-apa-qty-inner-gap: {{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'quantity_box_width',
+			array(
+				'label'      => __( 'Input Box Width', 'devsroom-dropdown-menu' ),
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px', '%' ),
+				'default'    => array(
+					'unit' => 'px',
+					'size' => 190,
+				),
+				'range'      => array(
+					'px' => array(
+						'min' => 100,
+						'max' => 500,
+					),
+					'%'  => array(
+						'min' => 20,
+						'max' => 100,
+					),
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .ddm-apa-qty-field'           => '--ddm-apa-qty-width: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .ddm-apa-cart-area .quantity' => 'width: {{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'quantity_box_padding',
+			array(
+				'label'      => __( 'Input Box Padding', 'devsroom-dropdown-menu' ),
+				'type'       => Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px', 'em', '%' ),
+				'selectors'  => array(
+					'{{WRAPPER}} .ddm-apa-qty-field' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				),
+			)
+		);
+
 		$this->add_group_control(
 			Group_Control_Typography::get_type(),
 			array(
@@ -504,7 +765,7 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 				'label'     => __( 'Input Background', 'devsroom-dropdown-menu' ),
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => array(
-					'{{WRAPPER}} .ddm-apa-qty-input, {{WRAPPER}} .ddm-apa-cart-area .qty' => 'background-color: {{VALUE}};',
+					'{{WRAPPER}} .ddm-apa-qty-field, {{WRAPPER}} .ddm-apa-qty-input, {{WRAPPER}} .ddm-apa-cart-area .qty' => 'background-color: {{VALUE}};',
 				),
 			)
 		);
@@ -515,7 +776,236 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 				'label'     => __( 'Input Border Color', 'devsroom-dropdown-menu' ),
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => array(
-					'{{WRAPPER}} .ddm-apa-qty-input, {{WRAPPER}} .ddm-apa-cart-area .qty' => 'border-color: {{VALUE}};',
+					'{{WRAPPER}} .ddm-apa-qty-field, {{WRAPPER}} .ddm-apa-qty-input, {{WRAPPER}} .ddm-apa-cart-area .qty' => 'border-color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Border::get_type(),
+			array(
+				'name'     => 'quantity_box_border',
+				'selector' => '{{WRAPPER}} .ddm-apa-qty-field',
+			)
+		);
+
+		$this->add_responsive_control(
+			'quantity_box_border_radius',
+			array(
+				'label'      => __( 'Input Box Border Radius', 'devsroom-dropdown-menu' ),
+				'type'       => Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px', '%' ),
+				'selectors'  => array(
+					'{{WRAPPER}} .ddm-apa-qty-field' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'quantity_icons_heading',
+			array(
+				'label'     => __( 'Icons (+/-)', 'devsroom-dropdown-menu' ),
+				'type'      => Controls_Manager::HEADING,
+				'separator' => 'before',
+			)
+		);
+
+		$this->add_responsive_control(
+			'quantity_icon_size',
+			array(
+				'label'      => __( 'Icon Size', 'devsroom-dropdown-menu' ),
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px', 'em', 'rem' ),
+				'range'      => array(
+					'px'  => array(
+						'min' => 8,
+						'max' => 80,
+					),
+					'em'  => array(
+						'min' => 0.5,
+						'max' => 5,
+					),
+					'rem' => array(
+						'min' => 0.5,
+						'max' => 5,
+					),
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .ddm-apa' => '--ddm-apa-icon-size: {{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->start_controls_tabs( 'quantity_icon_color_tabs' );
+
+		$this->start_controls_tab(
+			'quantity_icon_color_tab_normal',
+			array(
+				'label' => __( 'Normal', 'devsroom-dropdown-menu' ),
+			)
+		);
+
+		$this->add_control(
+			'quantity_icon_color',
+			array(
+				'label'     => __( 'Icon Color', 'devsroom-dropdown-menu' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ddm-apa-qty-btn, {{WRAPPER}} .ddm-apa-qty-btn .ddm-apa-qty-btn-icon, {{WRAPPER}} .ddm-apa-qty-btn .ddm-apa-qty-btn-icon i' => 'color: {{VALUE}};',
+					'{{WRAPPER}} .ddm-apa-qty-btn .ddm-apa-qty-btn-icon svg, {{WRAPPER}} .ddm-apa-qty-btn .ddm-apa-qty-btn-icon svg *' => 'fill: {{VALUE}}; stroke: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'quantity_icon_bg_color',
+			array(
+				'label'     => __( 'Icon Background', 'devsroom-dropdown-menu' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ddm-apa-qty-btn' => 'background-color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->end_controls_tab();
+
+		$this->start_controls_tab(
+			'quantity_icon_color_tab_hover',
+			array(
+				'label' => __( 'Hover', 'devsroom-dropdown-menu' ),
+			)
+		);
+
+		$this->add_control(
+			'quantity_icon_color_hover',
+			array(
+				'label'     => __( 'Icon Color', 'devsroom-dropdown-menu' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ddm-apa-qty-btn:hover, {{WRAPPER}} .ddm-apa-qty-btn:focus-visible, {{WRAPPER}} .ddm-apa-qty-btn:hover .ddm-apa-qty-btn-icon, {{WRAPPER}} .ddm-apa-qty-btn:hover .ddm-apa-qty-btn-icon i, {{WRAPPER}} .ddm-apa-qty-btn:focus-visible .ddm-apa-qty-btn-icon, {{WRAPPER}} .ddm-apa-qty-btn:focus-visible .ddm-apa-qty-btn-icon i' => 'color: {{VALUE}};',
+					'{{WRAPPER}} .ddm-apa-qty-btn:hover .ddm-apa-qty-btn-icon svg, {{WRAPPER}} .ddm-apa-qty-btn:hover .ddm-apa-qty-btn-icon svg *, {{WRAPPER}} .ddm-apa-qty-btn:focus-visible .ddm-apa-qty-btn-icon svg, {{WRAPPER}} .ddm-apa-qty-btn:focus-visible .ddm-apa-qty-btn-icon svg *' => 'fill: {{VALUE}}; stroke: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'quantity_icon_bg_color_hover',
+			array(
+				'label'     => __( 'Icon Background', 'devsroom-dropdown-menu' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ddm-apa-qty-btn:hover, {{WRAPPER}} .ddm-apa-qty-btn:focus-visible' => 'background-color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->end_controls_tab();
+		$this->end_controls_tabs();
+
+		$this->add_responsive_control(
+			'quantity_icon_padding',
+			array(
+				'label'      => __( 'Icon Padding', 'devsroom-dropdown-menu' ),
+				'type'       => Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px', 'em', '%' ),
+				'selectors'  => array(
+					'{{WRAPPER}} .ddm-apa-qty-btn' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'quantity_icon_border_radius',
+			array(
+				'label'      => __( 'Icon Border Radius', 'devsroom-dropdown-menu' ),
+				'type'       => Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px', '%' ),
+				'selectors'  => array(
+					'{{WRAPPER}} .ddm-apa-qty-btn' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'quantity_notice_heading',
+			array(
+				'label'     => __( 'Error Notice', 'devsroom-dropdown-menu' ),
+				'type'      => Controls_Manager::HEADING,
+				'separator' => 'before',
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Typography::get_type(),
+			array(
+				'name'     => 'quantity_notice_typography',
+				'selector' => '{{WRAPPER}} .ddm-apa-notice',
+			)
+		);
+
+		$this->add_control(
+			'quantity_notice_color',
+			array(
+				'label'     => __( 'Notice Text Color', 'devsroom-dropdown-menu' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ddm-apa-notice' => 'color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'quantity_notice_bg_color',
+			array(
+				'label'     => __( 'Notice Background', 'devsroom-dropdown-menu' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ddm-apa-notice' => 'background-color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Border::get_type(),
+			array(
+				'name'     => 'quantity_notice_border',
+				'selector' => '{{WRAPPER}} .ddm-apa-notice',
+			)
+		);
+
+		$this->add_responsive_control(
+			'quantity_notice_border_radius',
+			array(
+				'label'      => __( 'Notice Border Radius', 'devsroom-dropdown-menu' ),
+				'type'       => Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px', '%' ),
+				'selectors'  => array(
+					'{{WRAPPER}} .ddm-apa-notice' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'quantity_notice_padding',
+			array(
+				'label'      => __( 'Notice Padding', 'devsroom-dropdown-menu' ),
+				'type'       => Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px', 'em', '%' ),
+				'selectors'  => array(
+					'{{WRAPPER}} .ddm-apa-notice' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'quantity_notice_margin',
+			array(
+				'label'      => __( 'Notice Margin', 'devsroom-dropdown-menu' ),
+				'type'       => Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px', 'em', '%' ),
+				'selectors'  => array(
+					'{{WRAPPER}} .ddm-apa-notice' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				),
 			)
 		);
@@ -537,11 +1027,90 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 			)
 		);
 
+		$this->add_control(
+			'add_to_cart_width_mode',
+			array(
+				'label'                => __( 'Width', 'devsroom-dropdown-menu' ),
+				'type'                 => Controls_Manager::SELECT,
+				'options'              => array(
+					'custom' => __( 'Custom', 'devsroom-dropdown-menu' ),
+					'auto'   => __( 'Auto', 'devsroom-dropdown-menu' ),
+				),
+				'default'              => 'custom',
+				'selectors'            => array(
+					'{{WRAPPER}} .ddm-apa-add-to-cart, {{WRAPPER}} .ddm-apa-cart-area .single_add_to_cart_button' => 'width: {{VALUE}};',
+				),
+				'selectors_dictionary' => array(
+					'custom' => 'initial',
+					'auto'   => 'auto',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'add_to_cart_width',
+			array(
+				'label'      => __( 'Button Width', 'devsroom-dropdown-menu' ),
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( '%', 'px' ),
+				'range'      => array(
+					'%'  => array(
+						'min' => 10,
+						'max' => 100,
+					),
+					'px' => array(
+						'min' => 80,
+						'max' => 700,
+					),
+				),
+				'condition'  => array(
+					'add_to_cart_width_mode' => 'custom',
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .ddm-apa-add-to-cart'                    => 'width: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .ddm-apa-cart-area .single_add_to_cart_button' => 'width: {{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'add_to_cart_padding',
+			array(
+				'label'      => __( 'Padding', 'devsroom-dropdown-menu' ),
+				'type'       => Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px', 'em', '%' ),
+				'selectors'  => array(
+					'{{WRAPPER}} .ddm-apa-add-to-cart, {{WRAPPER}} .ddm-apa-cart-area .single_add_to_cart_button' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'add_to_cart_margin',
+			array(
+				'label'      => __( 'Margin', 'devsroom-dropdown-menu' ),
+				'type'       => Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px', 'em', '%' ),
+				'selectors'  => array(
+					'{{WRAPPER}} .ddm-apa-add-to-cart, {{WRAPPER}} .ddm-apa-cart-area .single_add_to_cart_button' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				),
+			)
+		);
+
 		$this->add_group_control(
 			Group_Control_Typography::get_type(),
 			array(
 				'name'     => 'add_to_cart_typography',
 				'selector' => '{{WRAPPER}} .ddm-apa-add-to-cart, {{WRAPPER}} .ddm-apa-cart-area .single_add_to_cart_button',
+			)
+		);
+
+		$this->start_controls_tabs( 'add_to_cart_color_tabs' );
+
+		$this->start_controls_tab(
+			'add_to_cart_color_tab_normal',
+			array(
+				'label' => __( 'Normal', 'devsroom-dropdown-menu' ),
 			)
 		);
 
@@ -567,6 +1136,68 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 			)
 		);
 
+		$this->end_controls_tab();
+
+		$this->start_controls_tab(
+			'add_to_cart_color_tab_hover',
+			array(
+				'label' => __( 'Hover', 'devsroom-dropdown-menu' ),
+			)
+		);
+
+		$this->add_control(
+			'add_to_cart_text_color_hover',
+			array(
+				'label'     => __( 'Text Color', 'devsroom-dropdown-menu' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ddm-apa-add-to-cart:hover, {{WRAPPER}} .ddm-apa-add-to-cart:focus-visible, {{WRAPPER}} .ddm-apa-cart-area .single_add_to_cart_button:hover, {{WRAPPER}} .ddm-apa-cart-area .single_add_to_cart_button:focus-visible' => 'color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'add_to_cart_background_color_hover',
+			array(
+				'label'     => __( 'Background Color', 'devsroom-dropdown-menu' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ddm-apa-add-to-cart:hover, {{WRAPPER}} .ddm-apa-add-to-cart:focus-visible, {{WRAPPER}} .ddm-apa-cart-area .single_add_to_cart_button:hover, {{WRAPPER}} .ddm-apa-cart-area .single_add_to_cart_button:focus-visible' => 'background-color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->end_controls_tab();
+		$this->end_controls_tabs();
+
+		$this->add_group_control(
+			Group_Control_Border::get_type(),
+			array(
+				'name'     => 'add_to_cart_border',
+				'selector' => '{{WRAPPER}} .ddm-apa-add-to-cart, {{WRAPPER}} .ddm-apa-cart-area .single_add_to_cart_button',
+			)
+		);
+
+		$this->add_responsive_control(
+			'add_to_cart_border_radius',
+			array(
+				'label'      => __( 'Border Radius', 'devsroom-dropdown-menu' ),
+				'type'       => Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px', '%' ),
+				'selectors'  => array(
+					'{{WRAPPER}} .ddm-apa-add-to-cart, {{WRAPPER}} .ddm-apa-cart-area .single_add_to_cart_button' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'add_to_cart_hover_animation',
+			array(
+				'label' => __( 'Hover Animation', 'devsroom-dropdown-menu' ),
+				'type'  => Controls_Manager::HOVER_ANIMATION,
+			)
+		);
+
 		$this->end_controls_section();
 	}
 
@@ -584,11 +1215,89 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 			)
 		);
 
+		$this->add_control(
+			'custom_button_width_mode',
+			array(
+				'label'                => __( 'Width', 'devsroom-dropdown-menu' ),
+				'type'                 => Controls_Manager::SELECT,
+				'options'              => array(
+					'custom' => __( 'Custom', 'devsroom-dropdown-menu' ),
+					'auto'   => __( 'Auto', 'devsroom-dropdown-menu' ),
+				),
+				'default'              => 'custom',
+				'selectors'            => array(
+					'{{WRAPPER}} .ddm-apa-custom-action-btn' => 'width: {{VALUE}};',
+				),
+				'selectors_dictionary' => array(
+					'custom' => 'initial',
+					'auto'   => 'auto',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'custom_button_width',
+			array(
+				'label'      => __( 'Button Width', 'devsroom-dropdown-menu' ),
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( '%', 'px' ),
+				'range'      => array(
+					'%'  => array(
+						'min' => 10,
+						'max' => 100,
+					),
+					'px' => array(
+						'min' => 80,
+						'max' => 700,
+					),
+				),
+				'condition'  => array(
+					'custom_button_width_mode' => 'custom',
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .ddm-apa-custom-action-btn' => 'width: {{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'custom_button_padding',
+			array(
+				'label'      => __( 'Padding', 'devsroom-dropdown-menu' ),
+				'type'       => Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px', 'em', '%' ),
+				'selectors'  => array(
+					'{{WRAPPER}} .ddm-apa-custom-action-btn' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'custom_button_margin',
+			array(
+				'label'      => __( 'Margin', 'devsroom-dropdown-menu' ),
+				'type'       => Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px', 'em', '%' ),
+				'selectors'  => array(
+					'{{WRAPPER}} .ddm-apa-custom-action-btn' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				),
+			)
+		);
+
 		$this->add_group_control(
 			Group_Control_Typography::get_type(),
 			array(
 				'name'     => 'custom_button_typography',
 				'selector' => '{{WRAPPER}} .ddm-apa-custom-action-btn',
+			)
+		);
+
+		$this->start_controls_tabs( 'custom_button_color_tabs' );
+
+		$this->start_controls_tab(
+			'custom_button_color_tab_normal',
+			array(
+				'label' => __( 'Normal', 'devsroom-dropdown-menu' ),
 			)
 		);
 
@@ -611,6 +1320,68 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 				'selectors' => array(
 					'{{WRAPPER}} .ddm-apa-custom-action-btn' => 'background-color: {{VALUE}};',
 				),
+			)
+		);
+
+		$this->end_controls_tab();
+
+		$this->start_controls_tab(
+			'custom_button_color_tab_hover',
+			array(
+				'label' => __( 'Hover', 'devsroom-dropdown-menu' ),
+			)
+		);
+
+		$this->add_control(
+			'custom_button_text_color_hover',
+			array(
+				'label'     => __( 'Text Color', 'devsroom-dropdown-menu' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ddm-apa-custom-action-btn:hover, {{WRAPPER}} .ddm-apa-custom-action-btn:focus-visible' => 'color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'custom_button_background_color_hover',
+			array(
+				'label'     => __( 'Background Color', 'devsroom-dropdown-menu' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ddm-apa-custom-action-btn:hover, {{WRAPPER}} .ddm-apa-custom-action-btn:focus-visible' => 'background-color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->end_controls_tab();
+		$this->end_controls_tabs();
+
+		$this->add_group_control(
+			Group_Control_Border::get_type(),
+			array(
+				'name'     => 'custom_button_border',
+				'selector' => '{{WRAPPER}} .ddm-apa-custom-action-btn',
+			)
+		);
+
+		$this->add_responsive_control(
+			'custom_button_border_radius',
+			array(
+				'label'      => __( 'Border Radius', 'devsroom-dropdown-menu' ),
+				'type'       => Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px', '%' ),
+				'selectors'  => array(
+					'{{WRAPPER}} .ddm-apa-custom-action-btn' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'custom_button_hover_animation',
+			array(
+				'label' => __( 'Hover Animation', 'devsroom-dropdown-menu' ),
+				'type'  => Controls_Manager::HOVER_ANIMATION,
 			)
 		);
 
@@ -639,21 +1410,31 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 		$show_quantity        = $this->is_switcher_enabled( $settings['show_quantity'] ?? 'yes' );
 		$show_quantity_label  = $show_quantity && $this->is_switcher_enabled( $settings['show_quantity_label'] ?? 'yes' );
 		$quantity_label       = sanitize_text_field( $settings['quantity_label'] ?? __( 'Qty:', 'devsroom-dropdown-menu' ) );
+		$quantity_label_pos   = $this->sanitize_quantity_label_position( $settings['quantity_label_position'] ?? 'left' );
+		$minus_icon_markup    = $this->get_icon_markup( $settings['minus_icon'] ?? array(), '-' );
+		$plus_icon_markup     = $this->get_icon_markup( $settings['plus_icon'] ?? array(), '+' );
 		$min_quantity         = max( 1, (int) ( $settings['min_quantity'] ?? 1 ) );
 		$max_quantity_raw     = (int) ( $settings['max_quantity'] ?? 10 );
 		$max_quantity         = max( $min_quantity, $max_quantity_raw );
 		$enable_max_limit     = $show_quantity && $this->is_switcher_enabled( $settings['enable_max_limit'] ?? '' );
+		$max_notice_template  = sanitize_textarea_field( $settings['max_limit_notice'] ?? __( 'You cannot order more than {max} items.', 'devsroom-dropdown-menu' ) );
+		$max_notice_text      = str_replace( '{max}', (string) $max_quantity, $max_notice_template );
 		$add_to_cart_text     = sanitize_text_field( $settings['add_to_cart_text'] ?? __( 'Add to Cart', 'devsroom-dropdown-menu' ) );
+		$add_to_cart_anim     = $this->sanitize_hover_animation( $settings['add_to_cart_hover_animation'] ?? '' );
 		$show_custom_button   = $this->is_switcher_enabled( $settings['show_custom_button'] ?? 'yes' );
 		$action_type          = $this->sanitize_action_type( $settings['action_type'] ?? 'whatsapp' );
 		$whatsapp_phone       = sanitize_text_field( $settings['whatsapp_phone'] ?? '' );
 		$messenger_page_id    = sanitize_text_field( $settings['messenger_page_id'] ?? '' );
 		$custom_button_text   = sanitize_text_field( $settings['custom_button_text'] ?? __( 'Buy via WhatsApp', 'devsroom-dropdown-menu' ) );
+		$custom_button_anim   = $this->sanitize_hover_animation( $settings['custom_button_hover_animation'] ?? '' );
+		$custom_button_bg     = $settings['custom_button_background_color'] ?? '';
 		$message_template     = sanitize_textarea_field( $settings['message_template'] ?? $this->get_default_message_template() );
 		$fallback_name        = sanitize_text_field( $product->get_name() );
 		$fallback_price       = sanitize_text_field( $this->get_product_price_text( $product ) );
 		$fallback_url         = esc_url_raw( get_permalink( $product->get_id() ) );
 		$button_disabled_attr = ( ! $product->is_purchasable() || ! $product->is_in_stock() ) ? ' disabled="disabled"' : '';
+		$custom_default_bg    = 'messenger' === $action_type ? '#1877F2' : '#25D366';
+		$custom_default_color = '#ffffff';
 
 		if ( '' === $add_to_cart_text ) {
 			$add_to_cart_text = __( 'Add to Cart', 'devsroom-dropdown-menu' );
@@ -665,6 +1446,21 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 
 		if ( '' === $message_template ) {
 			$message_template = $this->get_default_message_template();
+		}
+
+		if ( '' === $max_notice_template ) {
+			$max_notice_template = __( 'You cannot order more than {max} items.', 'devsroom-dropdown-menu' );
+			$max_notice_text     = str_replace( '{max}', (string) $max_quantity, $max_notice_template );
+		}
+
+		$add_to_cart_button_class = 'single_add_to_cart_button button alt ddm-apa-add-to-cart';
+		if ( '' !== $add_to_cart_anim ) {
+			$add_to_cart_button_class .= ' elementor-animation-' . $add_to_cart_anim;
+		}
+
+		$custom_button_class = 'ddm-apa-custom-action-btn button';
+		if ( '' !== $custom_button_anim ) {
+			$custom_button_class .= ' elementor-animation-' . $custom_button_anim;
 		}
 
 		$this->add_render_attribute(
@@ -679,7 +1475,10 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 				'data-enable-max-limit'      => $enable_max_limit ? 'yes' : 'no',
 				'data-min-qty'               => (string) $min_quantity,
 				'data-max-qty'               => (string) $max_quantity,
+				'data-max-notice-template'   => $max_notice_template,
+				'data-max-notice-text'       => $max_notice_text,
 				'data-add-to-cart-text'      => $add_to_cart_text,
+				'data-add-cart-animation'    => $add_to_cart_anim,
 				'data-fallback-name'         => $fallback_name,
 				'data-fallback-price'        => $fallback_price,
 				'data-fallback-url'          => $fallback_url,
@@ -707,38 +1506,37 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 			echo '<form class="cart ddm-apa-simple-cart" action="' . esc_url( $form_action ) . '" method="post" enctype="multipart/form-data">';
 
 			if ( $show_quantity ) {
-				echo '<div class="ddm-apa-qty-wrap">';
+				echo '<div class="ddm-apa-qty-wrap ddm-apa-qty-wrap--label-' . esc_attr( $quantity_label_pos ) . '">';
 
-				if ( $show_quantity_label && '' !== $quantity_label ) {
+				$render_label_before = in_array( $quantity_label_pos, array( 'left', 'top' ), true );
+				if ( $show_quantity_label && '' !== $quantity_label && $render_label_before ) {
 					echo '<label class="ddm-apa-qty-label" for="' . esc_attr( $instance_id . '-quantity' ) . '">' . esc_html( $quantity_label ) . '</label>';
 				}
 
-				if ( function_exists( 'woocommerce_quantity_input' ) ) {
-					$quantity_html = woocommerce_quantity_input(
-						array(
-							'input_id'    => $instance_id . '-quantity',
-							'input_name'  => 'quantity',
-							'input_value' => $min_quantity,
-							'min_value'   => $min_quantity,
-							'max_value'   => $max_quantity,
-							'classes'     => array( 'input-text', 'qty', 'text', 'ddm-apa-qty-input' ),
-						),
-						$product,
-						false
-					);
+				echo '<div class="ddm-apa-qty-field">';
+				echo '<div class="ddm-apa-qty-field-inner">';
+				echo '<button type="button" class="ddm-apa-qty-btn ddm-apa-qty-btn--minus" data-qty-step="-1" aria-label="' . esc_attr__( 'Decrease quantity', 'devsroom-dropdown-menu' ) . '">';
+				echo '<span class="ddm-apa-qty-btn-icon" aria-hidden="true">' . $minus_icon_markup . '</span>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				echo '</button>';
+				echo '<input id="' . esc_attr( $instance_id . '-quantity' ) . '" class="ddm-apa-qty-input qty" type="number" name="quantity" value="' . esc_attr( (string) $min_quantity ) . '" min="' . esc_attr( (string) $min_quantity ) . '" max="' . esc_attr( (string) $max_quantity ) . '" step="1" inputmode="numeric" pattern="[0-9]*">';
+				echo '<button type="button" class="ddm-apa-qty-btn ddm-apa-qty-btn--plus" data-qty-step="1" aria-label="' . esc_attr__( 'Increase quantity', 'devsroom-dropdown-menu' ) . '">';
+				echo '<span class="ddm-apa-qty-btn-icon" aria-hidden="true">' . $plus_icon_markup . '</span>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				echo '</button>';
+				echo '</div>';
+				echo '</div>';
 
-					echo $quantity_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-				} else {
-					echo '<input id="' . esc_attr( $instance_id . '-quantity' ) . '" class="ddm-apa-qty-input qty" type="number" name="quantity" value="' . esc_attr( (string) $min_quantity ) . '" min="' . esc_attr( (string) $min_quantity ) . '" max="' . esc_attr( (string) $max_quantity ) . '" step="1">';
+				if ( $show_quantity_label && '' !== $quantity_label && 'right' === $quantity_label_pos ) {
+					echo '<label class="ddm-apa-qty-label" for="' . esc_attr( $instance_id . '-quantity' ) . '">' . esc_html( $quantity_label ) . '</label>';
 				}
 
+				echo '<div class="ddm-apa-notice" aria-live="polite" hidden></div>';
 				echo '</div>';
 			} else {
 				echo '<input type="hidden" name="quantity" value="1">';
 			}
 
 			echo '<input type="hidden" name="product_id" value="' . esc_attr( (string) $product->get_id() ) . '">';
-			echo '<button type="submit" name="add-to-cart" value="' . esc_attr( (string) $product->get_id() ) . '" class="single_add_to_cart_button button alt ddm-apa-add-to-cart"' . $button_disabled_attr . '>';
+			echo '<button type="submit" name="add-to-cart" value="' . esc_attr( (string) $product->get_id() ) . '" class="' . esc_attr( $add_to_cart_button_class ) . '"' . $button_disabled_attr . '>';
 			echo esc_html( $add_to_cart_text );
 			echo '</button>';
 			echo '</form>';
@@ -749,13 +1547,55 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 		echo '</div>';
 
 		if ( $show_custom_button ) {
-			echo '<button type="button" class="ddm-apa-custom-action-btn button">' . esc_html( $custom_button_text ) . '</button>';
+			echo '<button type="button" class="' . esc_attr( $custom_button_class ) . '">' . esc_html( $custom_button_text ) . '</button>';
 		}
 
 		echo '</div>';
 		echo '</div>';
 
+		$this->render_inline_styles(
+			$instance_id,
+			array(
+				'custom_bg'       => $custom_default_bg,
+				'custom_text'     => $custom_default_color,
+				'has_custom_bg'   => ! empty( $custom_button_bg ),
+			)
+		);
 		$this->render_inline_script( $instance_id );
+	}
+
+	/**
+	 * Outputs per-instance default styling for quantity stepper UI.
+	 *
+	 * @param string $instance_id Widget instance ID.
+	 * @param array  $style_args  Runtime style defaults.
+	 * @return void
+	 */
+	private function render_inline_styles( $instance_id, array $style_args = array() ) {
+		$scoped_id = '#' . $instance_id;
+		$custom_bg = $style_args['custom_bg'] ?? '#25D366';
+		$custom_tx = $style_args['custom_text'] ?? '#ffffff';
+		$has_bg    = ! empty( $style_args['has_custom_bg'] );
+
+		echo '<style id="' . esc_attr( $instance_id . '-style' ) . '">';
+		echo $scoped_id . '{--ddm-apa-qty-width:190px;--ddm-apa-qty-label-gap:10px;--ddm-apa-qty-inner-gap:0px;--ddm-apa-icon-size:24px;--ddm-apa-button-gap:0px;}';
+		echo $scoped_id . ' .ddm-apa-simple-cart{display:flex;align-items:center;flex-wrap:wrap;gap:var(--ddm-apa-button-gap);}';
+		echo $scoped_id . ' .ddm-apa-qty-wrap{display:flex;align-items:center;column-gap:var(--ddm-apa-qty-label-gap);row-gap:var(--ddm-apa-qty-label-gap);flex-wrap:wrap;}';
+		echo $scoped_id . ' .ddm-apa-qty-wrap--label-top{flex-direction:column;align-items:flex-start;}';
+		echo $scoped_id . ' .ddm-apa-qty-field{display:block;width:var(--ddm-apa-qty-width);min-height:44px;border:1px solid #d7d7d7;background:#f4f4f4;overflow:hidden;}';
+		echo $scoped_id . ' .ddm-apa-qty-field-inner{display:flex;align-items:center;justify-content:space-between;gap:var(--ddm-apa-qty-inner-gap);}';
+		echo $scoped_id . ' .ddm-apa-qty-btn{width:46px;min-height:44px;border:0;background:transparent;color:#8d8d8d;line-height:1;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center;transition:color 180ms ease,background-color 180ms ease;}';
+		echo $scoped_id . ' .ddm-apa-qty-btn:hover,' . $scoped_id . ' .ddm-apa-qty-btn:focus-visible{color:#44596f;background:rgba(0,0,0,0.03);outline:none;}';
+		echo $scoped_id . ' .ddm-apa-qty-btn .ddm-apa-qty-btn-icon,' . $scoped_id . ' .ddm-apa-qty-btn .ddm-apa-qty-btn-icon i,' . $scoped_id . ' .ddm-apa-qty-btn .ddm-apa-qty-btn-icon svg{font-size:var(--ddm-apa-icon-size);width:var(--ddm-apa-icon-size);height:var(--ddm-apa-icon-size);line-height:1;}';
+		echo $scoped_id . ' .ddm-apa-qty-input{flex:1 1 auto;min-width:0;height:44px;border:0;background:transparent;text-align:center;font-size:28px;font-weight:600;color:#5f738a;padding:0 4px;appearance:textfield;-moz-appearance:textfield;}';
+		echo $scoped_id . ' .ddm-apa-qty-input::-webkit-outer-spin-button,' . $scoped_id . ' .ddm-apa-qty-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}';
+		echo $scoped_id . ' .ddm-apa-notice{display:block;margin-top:8px;padding:8px 12px;font-size:13px;line-height:1.4;color:#991b1b;background:#fef2f2;border:1px solid #fecaca;}';
+		echo $scoped_id . ' .ddm-apa-notice[hidden]{display:none!important;}';
+		if ( ! $has_bg ) {
+			echo $scoped_id . ' .ddm-apa-custom-action-btn{background-color:' . esc_attr( $custom_bg ) . ';color:' . esc_attr( $custom_tx ) . ';}';
+		}
+		echo $scoped_id . ' .ddm-apa__notice{padding:12px;border:1px dashed #d1d5db;color:#374151;font-size:13px;}';
+		echo '</style>';
 	}
 
 	/**
@@ -794,6 +1634,8 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 		echo 'if(!root||root.dataset.ddmApaInit==="yes"){return;}';
 		echo 'root.dataset.ddmApaInit="yes";';
 		echo 'var customButton=root.querySelector(".ddm-apa-custom-action-btn");';
+		echo 'var qtyButtons=root.querySelectorAll(".ddm-apa-qty-btn");';
+		echo 'var noticeBox=root.querySelector(".ddm-apa-notice");';
 		echo 'var addToCartButtons=root.querySelectorAll(".ddm-apa-cart-area .single_add_to_cart_button");';
 		echo 'var actionType=(root.dataset.actionType||"whatsapp").trim();';
 		echo 'var whatsappPhone=(root.dataset.whatsappPhone||"").trim();';
@@ -803,18 +1645,31 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 		echo 'var fallbackPrice=root.dataset.fallbackPrice||"";';
 		echo 'var fallbackUrl=root.dataset.fallbackUrl||window.location.href;';
 		echo 'var addToCartText=(root.dataset.addToCartText||"").trim();';
+		echo 'var addCartAnimation=(root.dataset.addCartAnimation||"").trim();';
 		echo 'var maxLimitEnabled=root.dataset.enableMaxLimit==="yes";';
 		echo 'var minQty=parseInt(root.dataset.minQty||"1",10);';
 		echo 'var maxQty=parseInt(root.dataset.maxQty||"10",10);';
-		echo 'var maxAlert=root.dataset.alertMax||("Maximum quantity allowed is "+maxQty+".");';
-		echo 'var minAlert=root.dataset.alertMin||("Minimum quantity is "+minQty+".");';
+		echo 'var maxNoticeTemplate=root.dataset.maxNoticeTemplate||"";';
+		echo 'var maxNoticeFallback=root.dataset.maxNoticeText||("Maximum quantity allowed is "+maxQty+".");';
 		echo 'var missingActionAlert=root.dataset.alertActionMissing||"Please configure a phone number or Messenger page ID.";';
 		echo 'if(!Number.isFinite(minQty)||minQty<1){minQty=1;}';
 		echo 'if(!Number.isFinite(maxQty)||maxQty<minQty){maxQty=minQty;}';
 		echo 'Array.prototype.forEach.call(addToCartButtons,function(button){';
 		echo 'if(!addToCartText){return;}';
 		echo 'if(button.tagName==="INPUT"){button.value=addToCartText;}else{button.textContent=addToCartText;}';
+		echo 'if(addCartAnimation){button.classList.add("elementor-animation-"+addCartAnimation);}';
 		echo '});';
+		echo 'function getMaxNoticeMessage(){';
+		echo 'var message=(maxNoticeTemplate||"").split("{max}").join(String(maxQty));';
+		echo 'if(!message){message=maxNoticeFallback||"";}';
+		echo 'return message;';
+		echo '}';
+		echo 'function setNotice(message){';
+		echo 'if(!noticeBox){return;}';
+		echo 'if(message){noticeBox.textContent=message;noticeBox.hidden=false;return;}';
+		echo 'noticeBox.textContent="";';
+		echo 'noticeBox.hidden=true;';
+		echo '}';
 		echo 'function readFirstText(selectors,fallback){';
 		echo 'for(var i=0;i<selectors.length;i++){';
 		echo 'var node=document.querySelector(selectors[i]);';
@@ -830,6 +1685,27 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 		echo 'output=output.split("{product_price}").join(data.product_price||"");';
 		echo 'output=output.split("{product_url}").join(data.product_url||"");';
 		echo 'return output;';
+		echo '}';
+		echo 'function stepQuantity(button){';
+		echo 'var field=button.closest(".ddm-apa-qty-field");';
+		echo 'if(!field){return;}';
+		echo 'var input=field.querySelector("input.qty,input[name=\\"quantity\\"]");';
+		echo 'if(!input){return;}';
+		echo 'var step=parseInt(button.dataset.qtyStep||"0",10);';
+		echo 'if(!Number.isFinite(step)||0===step){return;}';
+		echo 'var inputMin=parseInt(input.getAttribute("min")||"",10);';
+		echo 'var inputMax=parseInt(input.getAttribute("max")||"",10);';
+		echo 'var localMin=Number.isFinite(inputMin)?inputMin:minQty;';
+		echo 'var localMax=Number.isFinite(inputMax)?inputMax:maxQty;';
+		echo 'if(localMax<localMin){localMax=localMin;}';
+		echo 'var current=parseInt((input.value||"").trim(),10);';
+		echo 'if(!Number.isFinite(current)){current=localMin;}';
+		echo 'var next=current+step;';
+		echo 'if(next<localMin){next=localMin;}';
+		echo 'if(next>localMax){next=localMax;}';
+		echo 'input.value=String(next);';
+		echo 'input.dispatchEvent(new Event("change",{bubbles:true}));';
+		echo 'setNotice("");';
 		echo '}';
 		echo 'function buildDynamicMessage(){';
 		echo '/*';
@@ -858,8 +1734,10 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 		echo 'window.open(destination,"_blank","noopener,noreferrer");';
 		echo '}';
 		echo 'if(customButton){customButton.addEventListener("click",function(event){event.preventDefault();openCustomAction();});}';
+		echo 'Array.prototype.forEach.call(qtyButtons,function(button){';
+		echo 'button.addEventListener("click",function(event){event.preventDefault();stepQuantity(button);});';
+		echo '});';
 		echo 'function validateQuantityScope(scope){';
-		echo 'if(!maxLimitEnabled){return true;}';
 		echo 'var inputs=scope.querySelectorAll("input.qty,input[name=\\"quantity\\"]");';
 		echo 'for(var i=0;i<inputs.length;i++){';
 		echo 'var input=inputs[i];';
@@ -867,19 +1745,32 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 		echo 'if(!raw){continue;}';
 		echo 'var value=parseFloat(raw);';
 		echo 'if(!Number.isFinite(value)){continue;}';
-		echo 'if(value>maxQty){input.value=maxQty;window.alert(maxAlert);return false;}';
-		echo 'if(value<minQty){input.value=minQty;window.alert(minAlert);return false;}';
+		echo 'if(value<minQty){input.value=minQty;setNotice("");return false;}';
+		echo 'if(maxLimitEnabled&&value>maxQty){input.value=maxQty;setNotice(getMaxNoticeMessage());return false;}';
 		echo '}';
+		echo 'setNotice("");';
 		echo 'return true;';
 		echo '}';
-		echo 'if(maxLimitEnabled){';
 		echo 'var forms=root.querySelectorAll("form");';
 		echo 'Array.prototype.forEach.call(forms,function(form){';
 		echo 'form.addEventListener("submit",function(event){';
 		echo 'if(!validateQuantityScope(form)){event.preventDefault();event.stopPropagation();}';
 		echo '});';
 		echo '});';
-		echo '}';
+		echo 'var qtyInputs=root.querySelectorAll("input.qty,input[name=\\"quantity\\"]");';
+		echo 'Array.prototype.forEach.call(qtyInputs,function(input){';
+		echo 'input.addEventListener("input",function(){';
+		echo 'var value=parseFloat((input.value||"").trim());';
+		echo 'if(Number.isFinite(value)&&value<=maxQty){setNotice("");}';
+		echo '});';
+		echo 'input.addEventListener("change",function(){';
+		echo 'var value=parseFloat((input.value||"").trim());';
+		echo 'if(!Number.isFinite(value)){return;}';
+		echo 'if(value<minQty){input.value=minQty;setNotice("");return;}';
+		echo 'if(maxLimitEnabled&&value>maxQty){input.value=maxQty;setNotice(getMaxNoticeMessage());return;}';
+		echo 'setNotice("");';
+		echo '});';
+		echo '});';
 		echo '})();';
 		echo '</script>';
 	}
@@ -954,6 +1845,50 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 	}
 
 	/**
+	 * Returns icon markup from Elementor icon control.
+	 *
+	 * @param mixed  $icon_value    Icon control value.
+	 * @param string $text_fallback Text fallback when icon is empty.
+	 * @return string
+	 */
+	private function get_icon_markup( $icon_value, $text_fallback = '' ) {
+		$icon_html = '';
+
+		if ( is_array( $icon_value ) ) {
+			$icon_setting = $icon_value;
+			$raw_value    = $icon_setting['value'] ?? '';
+			$has_value    = ( is_array( $raw_value ) && ! empty( $raw_value ) ) || ( is_string( $raw_value ) && '' !== trim( $raw_value ) );
+
+			if ( $has_value ) {
+				ob_start();
+				Icons_Manager::render_icon(
+					$icon_setting,
+					array(
+						'aria-hidden' => 'true',
+					)
+				);
+				$icon_html = trim( (string) ob_get_clean() );
+			}
+		}
+
+		if ( '' === $icon_html ) {
+			$icon_html = esc_html( $text_fallback );
+		}
+
+		return $icon_html;
+	}
+
+	/**
+	 * Sanitizes quantity label position value.
+	 *
+	 * @param string $position Label position setting.
+	 * @return string
+	 */
+	private function sanitize_quantity_label_position( $position ) {
+		return in_array( $position, array( 'left', 'top', 'right' ), true ) ? $position : 'left';
+	}
+
+	/**
 	 * Sanitizes action type value.
 	 *
 	 * @param string $action_type Action type setting.
@@ -961,6 +1896,22 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 	 */
 	private function sanitize_action_type( $action_type ) {
 		return in_array( $action_type, array( 'whatsapp', 'messenger' ), true ) ? $action_type : 'whatsapp';
+	}
+
+	/**
+	 * Sanitizes Elementor hover animation setting.
+	 *
+	 * @param string $animation Raw animation value.
+	 * @return string
+	 */
+	private function sanitize_hover_animation( $animation ) {
+		$animation = strtolower( trim( (string) $animation ) );
+		if ( '' === $animation || 'none' === $animation ) {
+			return '';
+		}
+
+		$sanitized = preg_replace( '/[^a-z0-9_-]/', '', $animation );
+		return is_string( $sanitized ) ? $sanitized : '';
 	}
 
 	/**
