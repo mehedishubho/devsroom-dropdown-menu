@@ -1363,26 +1363,339 @@ class DDM_Dropdown_Menu_Widget extends Widget_Base {
 	 * @return void
 	 */
 	private function render_custom_css( $custom_css, $instance_id ) {
-		$custom_css = trim( (string) $custom_css );
+		$custom_css = (string) $custom_css;
 		if ( '' === $custom_css ) {
 			return;
 		}
 
-		$custom_css = wp_strip_all_tags( $custom_css, false );
-		$custom_css = str_replace( array( '</style>', '</STYLE>' ), '', $custom_css );
-		if ( '' === trim( $custom_css ) ) {
+		$custom_css = (string) preg_replace( '/<\/?style\b[^>]*>/i', '', $custom_css );
+		$custom_css = str_replace( "\0", '', $custom_css );
+		$custom_css = trim( $custom_css );
+		if ( '' === $custom_css ) {
 			return;
 		}
 
-		if ( false !== strpos( $custom_css, '{' ) && false !== strpos( $custom_css, '}' ) ) {
-			$scoped_css = str_replace( 'selector', '#' . $instance_id, $custom_css );
+		$scope      = '#' . $instance_id;
+		$has_blocks = false !== strpos( $custom_css, '{' ) && false !== strpos( $custom_css, '}' );
+		$has_token  = 1 === preg_match( '/\bselector\b/i', $custom_css );
+
+		$scope_mode = apply_filters(
+			'ddm_dropdown_menu_custom_css_scope_mode',
+			'auto',
+			$instance_id,
+			$custom_css
+		);
+
+		$scope_mode = is_string( $scope_mode ) ? strtolower( trim( $scope_mode ) ) : 'auto';
+		if ( ! in_array( $scope_mode, array( 'auto', 'legacy', 'require_selector' ), true ) ) {
+			$scope_mode = 'auto';
+		}
+
+		if ( 'legacy' === $scope_mode ) {
+			if ( $has_blocks ) {
+				$scoped_css = $has_token ? (string) preg_replace( '/\bselector\b/i', $scope, $custom_css ) : $custom_css;
+			} else {
+				$scoped_css = $scope . ' {' . $custom_css . '}';
+			}
 		} else {
-			$scoped_css = '#' . $instance_id . ' {' . $custom_css . '}';
+			if ( ! $has_blocks ) {
+				$scoped_css = $scope . ' {' . $custom_css . '}';
+			} elseif ( $has_token ) {
+				$scoped_css = (string) preg_replace( '/\bselector\b/i', $scope, $custom_css );
+			} elseif ( 'require_selector' === $scope_mode ) {
+				return;
+			} else {
+				$scoped_css = $this->scope_css_to_instance( $custom_css, $scope );
+			}
+		}
+
+		if ( '' === trim( $scoped_css ) ) {
+			return;
 		}
 
 		echo '<style id="' . esc_attr( $instance_id . '-custom-css' ) . '">';
 		echo $scoped_css; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo '</style>';
+	}
+
+	/**
+	 * Applies per-instance scoping to CSS rule selectors.
+	 *
+	 * @param string $css   CSS to scope.
+	 * @param string $scope Scope selector.
+	 * @return string
+	 */
+	private function scope_css_to_instance( $css, $scope ) {
+		$css    = (string) $css;
+		$length = strlen( $css );
+
+		if ( 0 === $length ) {
+			return '';
+		}
+
+		$output        = '';
+		$segment_start = 0;
+		$index         = 0;
+
+		while ( $index < $length ) {
+			$char = $css[ $index ];
+
+			if ( '"' === $char || "'" === $char ) {
+				$index = $this->skip_css_quoted_string( $css, $index );
+				continue;
+			}
+
+			if ( '/' === $char && $index + 1 < $length && '*' === $css[ $index + 1 ] ) {
+				$index = $this->skip_css_comment( $css, $index );
+				continue;
+			}
+
+			if ( '{' !== $char ) {
+				++$index;
+				continue;
+			}
+
+			$prelude = substr( $css, $segment_start, $index - $segment_start );
+			$closing = $this->find_matching_css_brace( $css, $index );
+
+			if ( false === $closing ) {
+				$output .= substr( $css, $segment_start );
+				return $output;
+			}
+
+			$block   = substr( $css, $index + 1, $closing - $index - 1 );
+			$prelude = trim( $prelude );
+
+			if ( '' === $prelude ) {
+				$output .= '{' . $block . '}';
+			} elseif ( '@' === $prelude[0] ) {
+				if ( $this->is_non_scopable_at_rule( $prelude ) ) {
+					$output .= $prelude . '{' . $block . '}';
+				} else {
+					$output .= $prelude . '{' . $this->scope_css_to_instance( $block, $scope ) . '}';
+				}
+			} else {
+				$selectors        = $this->split_css_selectors( $prelude );
+				$scoped_selectors = array();
+
+				foreach ( $selectors as $selector ) {
+					$selector = trim( $selector );
+					if ( '' === $selector ) {
+						continue;
+					}
+
+					if ( $this->is_selector_scoped_to_instance( $selector, $scope ) ) {
+						$scoped_selectors[] = $selector;
+						continue;
+					}
+
+					$scoped_selectors[] = $scope . ' ' . $selector;
+				}
+
+				if ( empty( $scoped_selectors ) ) {
+					$scoped_selectors[] = $scope;
+				}
+
+				$output .= implode( ', ', $scoped_selectors ) . '{' . $block . '}';
+			}
+
+			$index         = $closing + 1;
+			$segment_start = $index;
+		}
+
+		if ( $segment_start < $length ) {
+			$output .= substr( $css, $segment_start );
+		}
+
+		return $output;
+	}
+
+	/**
+	 * Splits a CSS selector list by commas while respecting nested syntax.
+	 *
+	 * @param string $selector_list Selector list.
+	 * @return string[]
+	 */
+	private function split_css_selectors( $selector_list ) {
+		$selector_list = (string) $selector_list;
+		$length        = strlen( $selector_list );
+		$selectors     = array();
+		$buffer        = '';
+		$paren_depth   = 0;
+		$bracket_depth = 0;
+		$index         = 0;
+
+		while ( $index < $length ) {
+			$char = $selector_list[ $index ];
+
+			if ( '"' === $char || "'" === $char ) {
+				$next   = $this->skip_css_quoted_string( $selector_list, $index );
+				$buffer .= substr( $selector_list, $index, $next - $index );
+				$index  = $next;
+				continue;
+			}
+
+			if ( '/' === $char && $index + 1 < $length && '*' === $selector_list[ $index + 1 ] ) {
+				$next   = $this->skip_css_comment( $selector_list, $index );
+				$buffer .= substr( $selector_list, $index, $next - $index );
+				$index  = $next;
+				continue;
+			}
+
+			if ( '(' === $char ) {
+				++$paren_depth;
+			} elseif ( ')' === $char && $paren_depth > 0 ) {
+				--$paren_depth;
+			} elseif ( '[' === $char ) {
+				++$bracket_depth;
+			} elseif ( ']' === $char && $bracket_depth > 0 ) {
+				--$bracket_depth;
+			} elseif ( ',' === $char && 0 === $paren_depth && 0 === $bracket_depth ) {
+				$trimmed = trim( $buffer );
+				if ( '' !== $trimmed ) {
+					$selectors[] = $trimmed;
+				}
+				$buffer = '';
+				++$index;
+				continue;
+			}
+
+			$buffer .= $char;
+			++$index;
+		}
+
+		$trimmed = trim( $buffer );
+		if ( '' !== $trimmed ) {
+			$selectors[] = $trimmed;
+		}
+
+		return $selectors;
+	}
+
+	/**
+	 * Determines whether selector already targets the current scope.
+	 *
+	 * @param string $selector Selector string.
+	 * @param string $scope    Scope selector.
+	 * @return bool
+	 */
+	private function is_selector_scoped_to_instance( $selector, $scope ) {
+		$pattern = '/(^|[\s>+~,])' . preg_quote( $scope, '/' ) . '(?=$|[\s>+~:\[.#])/';
+		return 1 === preg_match( $pattern, $selector );
+	}
+
+	/**
+	 * Determines whether an at-rule should not have its inner content re-scoped.
+	 *
+	 * @param string $prelude Raw at-rule prelude.
+	 * @return bool
+	 */
+	private function is_non_scopable_at_rule( $prelude ) {
+		$prelude = strtolower( ltrim( trim( (string) $prelude ), '@' ) );
+		if ( '' === $prelude ) {
+			return false;
+		}
+
+		$name = strtok( $prelude, " \t\r\n\f\v" );
+		return in_array(
+			$name,
+			array(
+				'keyframes',
+				'-webkit-keyframes',
+				'-moz-keyframes',
+				'-o-keyframes',
+				'font-face',
+				'counter-style',
+				'property',
+				'font-feature-values',
+				'page',
+			),
+			true
+		);
+	}
+
+	/**
+	 * Finds matching closing brace for a CSS block.
+	 *
+	 * @param string $css      CSS source.
+	 * @param int    $open_pos Opening brace position.
+	 * @return int|false
+	 */
+	private function find_matching_css_brace( $css, $open_pos ) {
+		$length = strlen( $css );
+		$depth  = 1;
+		$index  = $open_pos + 1;
+
+		while ( $index < $length ) {
+			$char = $css[ $index ];
+
+			if ( '"' === $char || "'" === $char ) {
+				$index = $this->skip_css_quoted_string( $css, $index );
+				continue;
+			}
+
+			if ( '/' === $char && $index + 1 < $length && '*' === $css[ $index + 1 ] ) {
+				$index = $this->skip_css_comment( $css, $index );
+				continue;
+			}
+
+			if ( '{' === $char ) {
+				++$depth;
+			} elseif ( '}' === $char ) {
+				--$depth;
+				if ( 0 === $depth ) {
+					return $index;
+				}
+			}
+
+			++$index;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Skips a quoted CSS string and returns the next parsing position.
+	 *
+	 * @param string $css   CSS source.
+	 * @param int    $index Start index at opening quote.
+	 * @return int
+	 */
+	private function skip_css_quoted_string( $css, $index ) {
+		$quote  = $css[ $index ];
+		$length = strlen( $css );
+		$index += 1;
+
+		while ( $index < $length ) {
+			if ( '\\' === $css[ $index ] ) {
+				$index += 2;
+				continue;
+			}
+
+			if ( $quote === $css[ $index ] ) {
+				return $index + 1;
+			}
+
+			++$index;
+		}
+
+		return $length;
+	}
+
+	/**
+	 * Skips a CSS comment and returns the next parsing position.
+	 *
+	 * @param string $css   CSS source.
+	 * @param int    $index Start index at comment opening slash.
+	 * @return int
+	 */
+	private function skip_css_comment( $css, $index ) {
+		$closing = strpos( $css, '*/', $index + 2 );
+		if ( false === $closing ) {
+			return strlen( $css );
+		}
+
+		return $closing + 2;
 	}
 
 	/**

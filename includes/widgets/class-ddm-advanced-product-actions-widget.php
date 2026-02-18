@@ -1036,6 +1036,81 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 			)
 		);
 
+		$this->add_control(
+			'quantity_decrease_icon_heading',
+			array(
+				'label'     => __( 'Decrease Icon Style', 'devsroom-dropdown-menu' ),
+				'type'      => Controls_Manager::HEADING,
+				'separator' => 'before',
+			)
+		);
+
+		$this->add_control(
+			'quantity_decrease_icon_color',
+			array(
+				'label'     => __( 'Decrease Icon Color', 'devsroom-dropdown-menu' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ddm-apa-qty-btn--minus, {{WRAPPER}} .ddm-apa-qty-btn--minus .ddm-apa-qty-btn-icon, {{WRAPPER}} .ddm-apa-qty-btn--minus .ddm-apa-qty-btn-icon i' => 'color: {{VALUE}};',
+					'{{WRAPPER}} .ddm-apa-qty-btn--minus .ddm-apa-qty-btn-icon svg, {{WRAPPER}} .ddm-apa-qty-btn--minus .ddm-apa-qty-btn-icon svg *' => 'fill: {{VALUE}}; stroke: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'quantity_decrease_icon_bg_color',
+			array(
+				'label'     => __( 'Decrease Icon Background', 'devsroom-dropdown-menu' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ddm-apa-qty-btn--minus' => 'background-color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'quantity_decrease_icon_color_hover',
+			array(
+				'label'     => __( 'Decrease Icon Hover Color', 'devsroom-dropdown-menu' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ddm-apa-qty-btn--minus:hover, {{WRAPPER}} .ddm-apa-qty-btn--minus:focus-visible, {{WRAPPER}} .ddm-apa-qty-btn--minus:hover .ddm-apa-qty-btn-icon, {{WRAPPER}} .ddm-apa-qty-btn--minus:hover .ddm-apa-qty-btn-icon i, {{WRAPPER}} .ddm-apa-qty-btn--minus:focus-visible .ddm-apa-qty-btn-icon, {{WRAPPER}} .ddm-apa-qty-btn--minus:focus-visible .ddm-apa-qty-btn-icon i' => 'color: {{VALUE}};',
+					'{{WRAPPER}} .ddm-apa-qty-btn--minus:hover .ddm-apa-qty-btn-icon svg, {{WRAPPER}} .ddm-apa-qty-btn--minus:hover .ddm-apa-qty-btn-icon svg *, {{WRAPPER}} .ddm-apa-qty-btn--minus:focus-visible .ddm-apa-qty-btn-icon svg, {{WRAPPER}} .ddm-apa-qty-btn--minus:focus-visible .ddm-apa-qty-btn-icon svg *' => 'fill: {{VALUE}}; stroke: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'quantity_decrease_icon_bg_color_hover',
+			array(
+				'label'     => __( 'Decrease Icon Hover Background', 'devsroom-dropdown-menu' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ddm-apa-qty-btn--minus:hover, {{WRAPPER}} .ddm-apa-qty-btn--minus:focus-visible' => 'background-color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Border::get_type(),
+			array(
+				'name'     => 'quantity_decrease_icon_border',
+				'label'    => __( 'Decrease Icon Border', 'devsroom-dropdown-menu' ),
+				'selector' => '{{WRAPPER}} .ddm-apa-qty-btn--minus',
+			)
+		);
+
+		$this->add_control(
+			'quantity_decrease_icon_border_color_hover',
+			array(
+				'label'     => __( 'Decrease Icon Hover Border Color', 'devsroom-dropdown-menu' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ddm-apa-qty-btn--minus:hover, {{WRAPPER}} .ddm-apa-qty-btn--minus:focus-visible' => 'border-color: {{VALUE}};',
+				),
+			)
+		);
+
 		$this->add_responsive_control(
 			'quantity_icon_padding',
 			array(
@@ -1171,7 +1246,7 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 				),
 				'default'              => 'custom',
 				'selectors'            => array(
-					'{{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button.ddm-apa-add-to-cart, {{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button' => 'width: {{VALUE}} !important;',
+					'{{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button.ddm-apa-add-to-cart, {{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button' => 'width: {{VALUE}};',
 				),
 				'selectors_dictionary' => array(
 					'custom' => 'initial',
@@ -1200,8 +1275,8 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 					'add_to_cart_width_mode' => 'custom',
 				),
 				'selectors'  => array(
-					'{{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button.ddm-apa-add-to-cart' => 'width: {{SIZE}}{{UNIT}} !important;',
-					'{{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button'                       => 'width: {{SIZE}}{{UNIT}} !important;',
+					'{{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button.ddm-apa-add-to-cart' => 'width: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button'                       => 'width: {{SIZE}}{{UNIT}};',
 				),
 			)
 		);
@@ -1213,7 +1288,7 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 				'type'       => Controls_Manager::DIMENSIONS,
 				'size_units' => array( 'px', 'em', '%' ),
 				'selectors'  => array(
-					'{{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button.ddm-apa-add-to-cart, {{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}} !important;',
+					'{{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button.ddm-apa-add-to-cart, {{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				),
 			)
 		);
@@ -1225,7 +1300,7 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 				'type'       => Controls_Manager::DIMENSIONS,
 				'size_units' => array( 'px', 'em', '%' ),
 				'selectors'  => array(
-					'{{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button.ddm-apa-add-to-cart, {{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}} !important;',
+					'{{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button.ddm-apa-add-to-cart, {{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				),
 			)
 		);
@@ -1253,7 +1328,7 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 				'label'     => __( 'Text Color', 'devsroom-dropdown-menu' ),
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => array(
-					'{{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button.ddm-apa-add-to-cart, {{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button' => 'color: {{VALUE}} !important;',
+					'{{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button.ddm-apa-add-to-cart, {{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button' => 'color: {{VALUE}};',
 				),
 			)
 		);
@@ -1264,7 +1339,7 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 				'label'     => __( 'Background Color', 'devsroom-dropdown-menu' ),
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => array(
-					'{{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button.ddm-apa-add-to-cart, {{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button' => 'background-color: {{VALUE}} !important;',
+					'{{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button.ddm-apa-add-to-cart, {{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button' => 'background-color: {{VALUE}};',
 				),
 			)
 		);
@@ -1284,7 +1359,7 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 				'label'     => __( 'Text Color', 'devsroom-dropdown-menu' ),
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => array(
-					'{{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button.ddm-apa-add-to-cart:hover, {{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button.ddm-apa-add-to-cart:focus-visible, {{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button:hover, {{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button:focus-visible' => 'color: {{VALUE}} !important;',
+					'{{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button.ddm-apa-add-to-cart:hover, {{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button.ddm-apa-add-to-cart:focus-visible, {{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button:hover, {{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button:focus-visible' => 'color: {{VALUE}};',
 				),
 			)
 		);
@@ -1295,7 +1370,7 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 				'label'     => __( 'Background Color', 'devsroom-dropdown-menu' ),
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => array(
-					'{{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button.ddm-apa-add-to-cart:hover, {{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button.ddm-apa-add-to-cart:focus-visible, {{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button:hover, {{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button:focus-visible' => 'background-color: {{VALUE}} !important;',
+					'{{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button.ddm-apa-add-to-cart:hover, {{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button.ddm-apa-add-to-cart:focus-visible, {{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button:hover, {{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button:focus-visible' => 'background-color: {{VALUE}};',
 				),
 			)
 		);
@@ -1318,7 +1393,7 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 				'type'       => Controls_Manager::DIMENSIONS,
 				'size_units' => array( 'px', '%' ),
 				'selectors'  => array(
-					'{{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button.ddm-apa-add-to-cart, {{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}} !important;',
+					'{{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button.ddm-apa-add-to-cart, {{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				),
 			)
 		);
