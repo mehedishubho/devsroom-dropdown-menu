@@ -842,6 +842,7 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 			Group_Control_Border::get_type(),
 			array(
 				'name'     => 'quantity_box_border',
+				'label'    => __( 'Quantity Box Border', 'devsroom-dropdown-menu' ),
 				'selector' => '{{WRAPPER}} .ddm-apa-qty-field',
 			)
 		);
@@ -1011,6 +1012,26 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => array(
 					'{{WRAPPER}} .ddm-apa-qty-btn--plus:hover, {{WRAPPER}} .ddm-apa-qty-btn--plus:focus-visible' => 'background-color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Border::get_type(),
+			array(
+				'name'     => 'quantity_increase_icon_border',
+				'label'    => __( 'Increase Icon Border', 'devsroom-dropdown-menu' ),
+				'selector' => '{{WRAPPER}} .ddm-apa-qty-btn--plus',
+			)
+		);
+
+		$this->add_control(
+			'quantity_increase_icon_border_color_hover',
+			array(
+				'label'     => __( 'Increase Icon Hover Border Color', 'devsroom-dropdown-menu' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ddm-apa-qty-btn--plus:hover, {{WRAPPER}} .ddm-apa-qty-btn--plus:focus-visible' => 'border-color: {{VALUE}};',
 				),
 			)
 		);
@@ -1714,7 +1735,7 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 		echo $scoped_id . ' .ddm-apa-qty-wrap .advanced-qty-notice{grid-column:1/-1;}';
 		echo $scoped_id . ' .ddm-apa-qty-field{display:block;width:var(--ddm-apa-qty-width);max-width:100%;min-height:42px;overflow:hidden;border:1px solid #ced4dc;border-radius:0;background-color:#ffffff;}';
 		echo $scoped_id . ' .ddm-apa-qty-field-inner{display:flex;align-items:center;justify-content:space-between;gap:var(--ddm-apa-qty-inner-gap);min-height:42px;}';
-		echo $scoped_id . ' .ddm-apa-qty-btn{width:48px;min-height:42px;border:0;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#9ca3af;background:transparent;transition:color 180ms ease,background-color 180ms ease;}';
+		echo $scoped_id . ' .ddm-apa-qty-btn{width:48px;min-height:42px;border:1px solid transparent;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#9ca3af;background:transparent;transition:color 180ms ease,background-color 180ms ease,border-color 180ms ease;}';
 		echo $scoped_id . ' .ddm-apa-qty-btn:focus-visible{outline:none;}';
 		echo $scoped_id . ' .ddm-apa-qty-btn .ddm-apa-qty-btn-icon,' . $scoped_id . ' .ddm-apa-qty-btn .ddm-apa-qty-btn-icon i,' . $scoped_id . ' .ddm-apa-qty-btn .ddm-apa-qty-btn-icon svg{font-size:var(--ddm-apa-icon-size);width:var(--ddm-apa-icon-size);height:var(--ddm-apa-icon-size);line-height:1;font-weight:400;}';
 		echo $scoped_id . ' .ddm-apa-qty-input{flex:1 1 auto;min-width:0;height:42px;border:0;text-align:center;appearance:textfield;-moz-appearance:textfield;padding:0 6px;background:transparent;color:#5f748b;font-size:22px;line-height:1.2;font-weight:500;}';

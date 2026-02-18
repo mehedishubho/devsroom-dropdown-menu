@@ -4,7 +4,7 @@
  * Plugin Name: Devsroom Custom Toolkit
  * Plugin URI:  https://devsroom.com
  * Description: A lightweight and scalable WordPress toolkit developed by Mehedi Hassan Shubho (Devsroom). Built for performance, security, and modern WordPress standards.
- * Version:     1.3.3
+ * Version:     1.3.4
  * Author:      Mehedi Hassan Shubho
  * Author URI:  https://wpmhs.com
  * License:     GPL v2 or later
