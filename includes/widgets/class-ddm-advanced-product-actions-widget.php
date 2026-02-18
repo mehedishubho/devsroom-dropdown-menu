@@ -153,8 +153,8 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 				'label'     => __( 'Minus Icon', 'devsroom-dropdown-menu' ),
 				'type'      => Controls_Manager::ICONS,
 				'default'   => array(
-					'value'   => 'fas fa-minus',
-					'library' => 'fa-solid',
+					'value'   => '',
+					'library' => '',
 				),
 				'condition' => array(
 					'show_quantity' => 'yes',
@@ -165,12 +165,14 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 		$this->add_control(
 			'plus_icon',
 			array(
-				'label'     => __( 'Plus Icon', 'devsroom-dropdown-menu' ),
+				'label'       => __( 'Increase Icon (+)', 'devsroom-dropdown-menu' ),
 				'type'      => Controls_Manager::ICONS,
 				'default'   => array(
-					'value'   => 'fas fa-plus',
-					'library' => 'fa-solid',
+					'value'   => '',
+					'library' => '',
 				),
+				'description' => __( 'Icon shown on the right-side quantity increase button.', 'devsroom-dropdown-menu' ),
+				'label_block' => true,
 				'condition' => array(
 					'show_quantity' => 'yes',
 				),
@@ -251,11 +253,42 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 		);
 
 		$this->add_control(
+			'show_add_to_cart',
+			array(
+				'label'        => __( 'Show Add to Cart', 'devsroom-dropdown-menu' ),
+				'type'         => Controls_Manager::SWITCHER,
+				'label_on'     => __( 'Yes', 'devsroom-dropdown-menu' ),
+				'label_off'    => __( 'No', 'devsroom-dropdown-menu' ),
+				'return_value' => 'yes',
+				'default'      => 'yes',
+			)
+		);
+
+		$this->add_control(
 			'add_to_cart_text',
 			array(
 				'label'   => __( 'Button Text', 'devsroom-dropdown-menu' ),
 				'type'    => Controls_Manager::TEXT,
 				'default' => __( 'Add to Cart', 'devsroom-dropdown-menu' ),
+				'condition' => array(
+					'show_add_to_cart' => 'yes',
+				),
+			)
+		);
+
+		$this->add_control(
+			'add_to_cart_link',
+			array(
+				'label'         => __( 'Redirect Link After Add', 'devsroom-dropdown-menu' ),
+				'type'          => Controls_Manager::URL,
+				'placeholder'   => __( 'https://your-site.com/cart', 'devsroom-dropdown-menu' ),
+				'show_external' => false,
+				'default'       => array(
+					'url' => '',
+				),
+				'condition'     => array(
+					'show_add_to_cart' => 'yes',
+				),
 			)
 		);
 
@@ -460,6 +493,18 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 			)
 		);
 
+		$this->add_responsive_control(
+			'layout_margin',
+			array(
+				'label'      => __( 'Widget Margin', 'devsroom-dropdown-menu' ),
+				'type'       => Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px', 'em', '%' ),
+				'selectors'  => array(
+					'{{WRAPPER}} .ddm-apa' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				),
+			)
+		);
+
 		$this->end_controls_section();
 	}
 
@@ -485,6 +530,18 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 				'size_units' => array( 'px', 'em', '%' ),
 				'selectors'  => array(
 					'{{WRAPPER}} .ddm-apa' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'container_margin',
+			array(
+				'label'      => __( 'Margin', 'devsroom-dropdown-menu' ),
+				'type'       => Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px', 'em', '%' ),
+				'selectors'  => array(
+					'{{WRAPPER}} .ddm-apa' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				),
 			)
 		);
@@ -721,7 +778,7 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 					),
 				),
 				'selectors'  => array(
-					'{{WRAPPER}} .ddm-apa-qty-field'           => '--ddm-apa-qty-width: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .ddm-apa-qty-field'           => '--ddm-apa-qty-width: {{SIZE}}{{UNIT}}; width: {{SIZE}}{{UNIT}};',
 					'{{WRAPPER}} .ddm-apa-cart-area .quantity' => 'width: {{SIZE}}{{UNIT}};',
 				),
 			)
@@ -903,6 +960,61 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 		$this->end_controls_tab();
 		$this->end_controls_tabs();
 
+		$this->add_control(
+			'quantity_increase_icon_heading',
+			array(
+				'label'     => __( 'Increase Icon Style', 'devsroom-dropdown-menu' ),
+				'type'      => Controls_Manager::HEADING,
+				'separator' => 'before',
+			)
+		);
+
+		$this->add_control(
+			'quantity_increase_icon_color',
+			array(
+				'label'     => __( 'Increase Icon Color', 'devsroom-dropdown-menu' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ddm-apa-qty-btn--plus, {{WRAPPER}} .ddm-apa-qty-btn--plus .ddm-apa-qty-btn-icon, {{WRAPPER}} .ddm-apa-qty-btn--plus .ddm-apa-qty-btn-icon i' => 'color: {{VALUE}};',
+					'{{WRAPPER}} .ddm-apa-qty-btn--plus .ddm-apa-qty-btn-icon svg, {{WRAPPER}} .ddm-apa-qty-btn--plus .ddm-apa-qty-btn-icon svg *' => 'fill: {{VALUE}}; stroke: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'quantity_increase_icon_bg_color',
+			array(
+				'label'     => __( 'Increase Icon Background', 'devsroom-dropdown-menu' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ddm-apa-qty-btn--plus' => 'background-color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'quantity_increase_icon_color_hover',
+			array(
+				'label'     => __( 'Increase Icon Hover Color', 'devsroom-dropdown-menu' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ddm-apa-qty-btn--plus:hover, {{WRAPPER}} .ddm-apa-qty-btn--plus:focus-visible, {{WRAPPER}} .ddm-apa-qty-btn--plus:hover .ddm-apa-qty-btn-icon, {{WRAPPER}} .ddm-apa-qty-btn--plus:hover .ddm-apa-qty-btn-icon i, {{WRAPPER}} .ddm-apa-qty-btn--plus:focus-visible .ddm-apa-qty-btn-icon, {{WRAPPER}} .ddm-apa-qty-btn--plus:focus-visible .ddm-apa-qty-btn-icon i' => 'color: {{VALUE}};',
+					'{{WRAPPER}} .ddm-apa-qty-btn--plus:hover .ddm-apa-qty-btn-icon svg, {{WRAPPER}} .ddm-apa-qty-btn--plus:hover .ddm-apa-qty-btn-icon svg *, {{WRAPPER}} .ddm-apa-qty-btn--plus:focus-visible .ddm-apa-qty-btn-icon svg, {{WRAPPER}} .ddm-apa-qty-btn--plus:focus-visible .ddm-apa-qty-btn-icon svg *' => 'fill: {{VALUE}}; stroke: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'quantity_increase_icon_bg_color_hover',
+			array(
+				'label'     => __( 'Increase Icon Hover Background', 'devsroom-dropdown-menu' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ddm-apa-qty-btn--plus:hover, {{WRAPPER}} .ddm-apa-qty-btn--plus:focus-visible' => 'background-color: {{VALUE}};',
+				),
+			)
+		);
+
 		$this->add_responsive_control(
 			'quantity_icon_padding',
 			array(
@@ -940,7 +1052,7 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 			Group_Control_Typography::get_type(),
 			array(
 				'name'     => 'quantity_notice_typography',
-				'selector' => '{{WRAPPER}} .ddm-apa-notice',
+				'selector' => '{{WRAPPER}} .advanced-qty-notice',
 			)
 		);
 
@@ -950,7 +1062,7 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 				'label'     => __( 'Notice Text Color', 'devsroom-dropdown-menu' ),
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => array(
-					'{{WRAPPER}} .ddm-apa-notice' => 'color: {{VALUE}};',
+					'{{WRAPPER}} .advanced-qty-notice' => 'color: {{VALUE}};',
 				),
 			)
 		);
@@ -961,7 +1073,7 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 				'label'     => __( 'Notice Background', 'devsroom-dropdown-menu' ),
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => array(
-					'{{WRAPPER}} .ddm-apa-notice' => 'background-color: {{VALUE}};',
+					'{{WRAPPER}} .advanced-qty-notice' => 'background-color: {{VALUE}};',
 				),
 			)
 		);
@@ -970,7 +1082,7 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 			Group_Control_Border::get_type(),
 			array(
 				'name'     => 'quantity_notice_border',
-				'selector' => '{{WRAPPER}} .ddm-apa-notice',
+				'selector' => '{{WRAPPER}} .advanced-qty-notice',
 			)
 		);
 
@@ -981,7 +1093,7 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 				'type'       => Controls_Manager::DIMENSIONS,
 				'size_units' => array( 'px', '%' ),
 				'selectors'  => array(
-					'{{WRAPPER}} .ddm-apa-notice' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+					'{{WRAPPER}} .advanced-qty-notice' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				),
 			)
 		);
@@ -993,7 +1105,7 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 				'type'       => Controls_Manager::DIMENSIONS,
 				'size_units' => array( 'px', 'em', '%' ),
 				'selectors'  => array(
-					'{{WRAPPER}} .ddm-apa-notice' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+					'{{WRAPPER}} .advanced-qty-notice' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				),
 			)
 		);
@@ -1005,7 +1117,7 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 				'type'       => Controls_Manager::DIMENSIONS,
 				'size_units' => array( 'px', 'em', '%' ),
 				'selectors'  => array(
-					'{{WRAPPER}} .ddm-apa-notice' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+					'{{WRAPPER}} .advanced-qty-notice' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				),
 			)
 		);
@@ -1038,7 +1150,7 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 				),
 				'default'              => 'custom',
 				'selectors'            => array(
-					'{{WRAPPER}} .ddm-apa-add-to-cart, {{WRAPPER}} .ddm-apa-cart-area .single_add_to_cart_button' => 'width: {{VALUE}};',
+					'{{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button.ddm-apa-add-to-cart, {{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button' => 'width: {{VALUE}} !important;',
 				),
 				'selectors_dictionary' => array(
 					'custom' => 'initial',
@@ -1067,8 +1179,8 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 					'add_to_cart_width_mode' => 'custom',
 				),
 				'selectors'  => array(
-					'{{WRAPPER}} .ddm-apa-add-to-cart'                    => 'width: {{SIZE}}{{UNIT}};',
-					'{{WRAPPER}} .ddm-apa-cart-area .single_add_to_cart_button' => 'width: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button.ddm-apa-add-to-cart' => 'width: {{SIZE}}{{UNIT}} !important;',
+					'{{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button'                       => 'width: {{SIZE}}{{UNIT}} !important;',
 				),
 			)
 		);
@@ -1080,7 +1192,7 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 				'type'       => Controls_Manager::DIMENSIONS,
 				'size_units' => array( 'px', 'em', '%' ),
 				'selectors'  => array(
-					'{{WRAPPER}} .ddm-apa-add-to-cart, {{WRAPPER}} .ddm-apa-cart-area .single_add_to_cart_button' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+					'{{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button.ddm-apa-add-to-cart, {{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}} !important;',
 				),
 			)
 		);
@@ -1092,7 +1204,7 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 				'type'       => Controls_Manager::DIMENSIONS,
 				'size_units' => array( 'px', 'em', '%' ),
 				'selectors'  => array(
-					'{{WRAPPER}} .ddm-apa-add-to-cart, {{WRAPPER}} .ddm-apa-cart-area .single_add_to_cart_button' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+					'{{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button.ddm-apa-add-to-cart, {{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}} !important;',
 				),
 			)
 		);
@@ -1101,7 +1213,7 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 			Group_Control_Typography::get_type(),
 			array(
 				'name'     => 'add_to_cart_typography',
-				'selector' => '{{WRAPPER}} .ddm-apa-add-to-cart, {{WRAPPER}} .ddm-apa-cart-area .single_add_to_cart_button',
+				'selector' => '{{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button.ddm-apa-add-to-cart, {{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button',
 			)
 		);
 
@@ -1120,7 +1232,7 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 				'label'     => __( 'Text Color', 'devsroom-dropdown-menu' ),
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => array(
-					'{{WRAPPER}} .ddm-apa-add-to-cart, {{WRAPPER}} .ddm-apa-cart-area .single_add_to_cart_button' => 'color: {{VALUE}};',
+					'{{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button.ddm-apa-add-to-cart, {{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button' => 'color: {{VALUE}} !important;',
 				),
 			)
 		);
@@ -1131,7 +1243,7 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 				'label'     => __( 'Background Color', 'devsroom-dropdown-menu' ),
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => array(
-					'{{WRAPPER}} .ddm-apa-add-to-cart, {{WRAPPER}} .ddm-apa-cart-area .single_add_to_cart_button' => 'background-color: {{VALUE}};',
+					'{{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button.ddm-apa-add-to-cart, {{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button' => 'background-color: {{VALUE}} !important;',
 				),
 			)
 		);
@@ -1151,7 +1263,7 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 				'label'     => __( 'Text Color', 'devsroom-dropdown-menu' ),
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => array(
-					'{{WRAPPER}} .ddm-apa-add-to-cart:hover, {{WRAPPER}} .ddm-apa-add-to-cart:focus-visible, {{WRAPPER}} .ddm-apa-cart-area .single_add_to_cart_button:hover, {{WRAPPER}} .ddm-apa-cart-area .single_add_to_cart_button:focus-visible' => 'color: {{VALUE}};',
+					'{{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button.ddm-apa-add-to-cart:hover, {{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button.ddm-apa-add-to-cart:focus-visible, {{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button:hover, {{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button:focus-visible' => 'color: {{VALUE}} !important;',
 				),
 			)
 		);
@@ -1162,7 +1274,7 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 				'label'     => __( 'Background Color', 'devsroom-dropdown-menu' ),
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => array(
-					'{{WRAPPER}} .ddm-apa-add-to-cart:hover, {{WRAPPER}} .ddm-apa-add-to-cart:focus-visible, {{WRAPPER}} .ddm-apa-cart-area .single_add_to_cart_button:hover, {{WRAPPER}} .ddm-apa-cart-area .single_add_to_cart_button:focus-visible' => 'background-color: {{VALUE}};',
+					'{{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button.ddm-apa-add-to-cart:hover, {{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button.ddm-apa-add-to-cart:focus-visible, {{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button:hover, {{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button:focus-visible' => 'background-color: {{VALUE}} !important;',
 				),
 			)
 		);
@@ -1174,7 +1286,7 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 			Group_Control_Border::get_type(),
 			array(
 				'name'     => 'add_to_cart_border',
-				'selector' => '{{WRAPPER}} .ddm-apa-add-to-cart, {{WRAPPER}} .ddm-apa-cart-area .single_add_to_cart_button',
+				'selector' => '{{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button.ddm-apa-add-to-cart, {{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button',
 			)
 		);
 
@@ -1185,7 +1297,7 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 				'type'       => Controls_Manager::DIMENSIONS,
 				'size_units' => array( 'px', '%' ),
 				'selectors'  => array(
-					'{{WRAPPER}} .ddm-apa-add-to-cart, {{WRAPPER}} .ddm-apa-cart-area .single_add_to_cart_button' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+					'{{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button.ddm-apa-add-to-cart, {{WRAPPER}} .ddm-apa .ddm-apa-cart-area .single_add_to_cart_button' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}} !important;',
 				),
 			)
 		);
@@ -1419,7 +1531,11 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 		$enable_max_limit     = $show_quantity && $this->is_switcher_enabled( $settings['enable_max_limit'] ?? '' );
 		$max_notice_template  = sanitize_textarea_field( $settings['max_limit_notice'] ?? __( 'You cannot order more than {max} items.', 'devsroom-dropdown-menu' ) );
 		$max_notice_text      = str_replace( '{max}', (string) $max_quantity, $max_notice_template );
+		$input_max_attribute  = $enable_max_limit ? ' max="' . esc_attr( (string) $max_quantity ) . '"' : '';
+		$show_add_to_cart     = $this->is_switcher_enabled( $settings['show_add_to_cart'] ?? 'yes' );
 		$add_to_cart_text     = sanitize_text_field( $settings['add_to_cart_text'] ?? __( 'Add to Cart', 'devsroom-dropdown-menu' ) );
+		$add_to_cart_link     = isset( $settings['add_to_cart_link'] ) && is_array( $settings['add_to_cart_link'] ) ? $settings['add_to_cart_link'] : array();
+		$redirect_after_add   = ! empty( $add_to_cart_link['url'] ) ? esc_url_raw( $add_to_cart_link['url'] ) : '';
 		$add_to_cart_anim     = $this->sanitize_hover_animation( $settings['add_to_cart_hover_animation'] ?? '' );
 		$show_custom_button   = $this->is_switcher_enabled( $settings['show_custom_button'] ?? 'yes' );
 		$action_type          = $this->sanitize_action_type( $settings['action_type'] ?? 'whatsapp' );
@@ -1473,11 +1589,14 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 				'data-messenger-page-id'     => $messenger_page_id,
 				'data-message-template'      => $message_template,
 				'data-enable-max-limit'      => $enable_max_limit ? 'yes' : 'no',
+				'data-max-limit'             => (string) $max_quantity,
 				'data-min-qty'               => (string) $min_quantity,
 				'data-max-qty'               => (string) $max_quantity,
 				'data-max-notice-template'   => $max_notice_template,
 				'data-max-notice-text'       => $max_notice_text,
+				'data-show-add-to-cart'      => $show_add_to_cart ? 'yes' : 'no',
 				'data-add-to-cart-text'      => $add_to_cart_text,
+				'data-add-cart-redirect'     => $redirect_after_add,
 				'data-add-cart-animation'    => $add_to_cart_anim,
 				'data-fallback-name'         => $fallback_name,
 				'data-fallback-price'        => $fallback_price,
@@ -1500,48 +1619,55 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 		echo '<div class="ddm-apa-layout">';
 		echo '<div class="ddm-apa-cart-area">';
 
-		if ( $product->is_type( 'simple' ) ) {
-			$form_action = apply_filters( 'woocommerce_add_to_cart_form_action', $product->get_permalink() );
+		if ( $show_add_to_cart ) {
+			if ( $product->is_type( 'simple' ) ) {
+				$form_action = apply_filters( 'woocommerce_add_to_cart_form_action', $product->get_permalink() );
 
-			echo '<form class="cart ddm-apa-simple-cart" action="' . esc_url( $form_action ) . '" method="post" enctype="multipart/form-data">';
+				echo '<form class="cart ddm-apa-simple-cart" action="' . esc_url( $form_action ) . '" method="post" enctype="multipart/form-data">';
 
-			if ( $show_quantity ) {
-				echo '<div class="ddm-apa-qty-wrap ddm-apa-qty-wrap--label-' . esc_attr( $quantity_label_pos ) . '">';
+				if ( $show_quantity ) {
+					$qty_wrap_class = 'ddm-apa-qty-wrap ddm-apa-qty-wrap--label-' . $quantity_label_pos;
+					if ( ! $show_quantity_label || '' === $quantity_label ) {
+						$qty_wrap_class .= ' ddm-apa-qty-wrap--no-label';
+					}
 
-				$render_label_before = in_array( $quantity_label_pos, array( 'left', 'top' ), true );
-				if ( $show_quantity_label && '' !== $quantity_label && $render_label_before ) {
-					echo '<label class="ddm-apa-qty-label" for="' . esc_attr( $instance_id . '-quantity' ) . '">' . esc_html( $quantity_label ) . '</label>';
+					echo '<div class="' . esc_attr( $qty_wrap_class ) . '">';
+
+					$render_label_before = in_array( $quantity_label_pos, array( 'left', 'top' ), true );
+					if ( $show_quantity_label && '' !== $quantity_label && $render_label_before ) {
+						echo '<label class="ddm-apa-qty-label" for="' . esc_attr( $instance_id . '-quantity' ) . '">' . esc_html( $quantity_label ) . '</label>';
+					}
+
+					echo '<div class="ddm-apa-qty-field">';
+					echo '<div class="ddm-apa-qty-field-inner">';
+					echo '<button type="button" class="ddm-apa-qty-btn ddm-apa-qty-btn--minus" data-qty-step="-1" aria-label="' . esc_attr__( 'Decrease quantity', 'devsroom-dropdown-menu' ) . '">';
+					echo '<span class="ddm-apa-qty-btn-icon" aria-hidden="true">' . $minus_icon_markup . '</span>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					echo '</button>';
+					echo '<input id="' . esc_attr( $instance_id . '-quantity' ) . '" class="ddm-apa-qty-input qty" type="number" name="quantity" value="' . esc_attr( (string) $min_quantity ) . '" min="' . esc_attr( (string) $min_quantity ) . '"' . $input_max_attribute . ' data-max-limit="' . esc_attr( (string) $max_quantity ) . '" step="1" inputmode="numeric" pattern="[0-9]*">';
+					echo '<button type="button" class="ddm-apa-qty-btn ddm-apa-qty-btn--plus" data-qty-step="1" aria-label="' . esc_attr__( 'Increase quantity', 'devsroom-dropdown-menu' ) . '">';
+					echo '<span class="ddm-apa-qty-btn-icon" aria-hidden="true">' . $plus_icon_markup . '</span>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					echo '</button>';
+					echo '</div>';
+					echo '</div>';
+
+					if ( $show_quantity_label && '' !== $quantity_label && 'right' === $quantity_label_pos ) {
+						echo '<label class="ddm-apa-qty-label" for="' . esc_attr( $instance_id . '-quantity' ) . '">' . esc_html( $quantity_label ) . '</label>';
+					}
+
+					echo '<div class="ddm-apa-notice advanced-qty-notice" aria-live="polite" style="display:none;">' . esc_html( $max_notice_text ) . '</div>';
+					echo '</div>';
+				} else {
+					echo '<input type="hidden" name="quantity" value="1">';
 				}
 
-				echo '<div class="ddm-apa-qty-field">';
-				echo '<div class="ddm-apa-qty-field-inner">';
-				echo '<button type="button" class="ddm-apa-qty-btn ddm-apa-qty-btn--minus" data-qty-step="-1" aria-label="' . esc_attr__( 'Decrease quantity', 'devsroom-dropdown-menu' ) . '">';
-				echo '<span class="ddm-apa-qty-btn-icon" aria-hidden="true">' . $minus_icon_markup . '</span>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				echo '<input type="hidden" name="product_id" value="' . esc_attr( (string) $product->get_id() ) . '">';
+				echo '<button type="submit" name="add-to-cart" value="' . esc_attr( (string) $product->get_id() ) . '" class="' . esc_attr( $add_to_cart_button_class ) . '"' . $button_disabled_attr . '>';
+				echo esc_html( $add_to_cart_text );
 				echo '</button>';
-				echo '<input id="' . esc_attr( $instance_id . '-quantity' ) . '" class="ddm-apa-qty-input qty" type="number" name="quantity" value="' . esc_attr( (string) $min_quantity ) . '" min="' . esc_attr( (string) $min_quantity ) . '" max="' . esc_attr( (string) $max_quantity ) . '" step="1" inputmode="numeric" pattern="[0-9]*">';
-				echo '<button type="button" class="ddm-apa-qty-btn ddm-apa-qty-btn--plus" data-qty-step="1" aria-label="' . esc_attr__( 'Increase quantity', 'devsroom-dropdown-menu' ) . '">';
-				echo '<span class="ddm-apa-qty-btn-icon" aria-hidden="true">' . $plus_icon_markup . '</span>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-				echo '</button>';
-				echo '</div>';
-				echo '</div>';
-
-				if ( $show_quantity_label && '' !== $quantity_label && 'right' === $quantity_label_pos ) {
-					echo '<label class="ddm-apa-qty-label" for="' . esc_attr( $instance_id . '-quantity' ) . '">' . esc_html( $quantity_label ) . '</label>';
-				}
-
-				echo '<div class="ddm-apa-notice" aria-live="polite" hidden></div>';
-				echo '</div>';
+				echo '</form>';
 			} else {
-				echo '<input type="hidden" name="quantity" value="1">';
+				$this->render_native_add_to_cart( $product );
 			}
-
-			echo '<input type="hidden" name="product_id" value="' . esc_attr( (string) $product->get_id() ) . '">';
-			echo '<button type="submit" name="add-to-cart" value="' . esc_attr( (string) $product->get_id() ) . '" class="' . esc_attr( $add_to_cart_button_class ) . '"' . $button_disabled_attr . '>';
-			echo esc_html( $add_to_cart_text );
-			echo '</button>';
-			echo '</form>';
-		} else {
-			$this->render_native_add_to_cart( $product );
 		}
 
 		echo '</div>';
@@ -1572,25 +1698,28 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 	 * @return void
 	 */
 	private function render_inline_styles( $instance_id, array $style_args = array() ) {
-		$scoped_id = '#' . $instance_id;
+		$scoped_id = ':where(#' . $instance_id . ')';
 		$custom_bg = $style_args['custom_bg'] ?? '#25D366';
 		$custom_tx = $style_args['custom_text'] ?? '#ffffff';
 		$has_bg    = ! empty( $style_args['has_custom_bg'] );
 
 		echo '<style id="' . esc_attr( $instance_id . '-style' ) . '">';
-		echo $scoped_id . '{--ddm-apa-qty-width:190px;--ddm-apa-qty-label-gap:10px;--ddm-apa-qty-inner-gap:0px;--ddm-apa-icon-size:24px;--ddm-apa-button-gap:0px;}';
+		echo $scoped_id . '{--ddm-apa-qty-width:190px;--ddm-apa-qty-label-gap:10px;--ddm-apa-qty-inner-gap:0px;--ddm-apa-icon-size:18px;--ddm-apa-button-gap:0px;}';
 		echo $scoped_id . ' .ddm-apa-simple-cart{display:flex;align-items:center;flex-wrap:wrap;gap:var(--ddm-apa-button-gap);}';
-		echo $scoped_id . ' .ddm-apa-qty-wrap{display:flex;align-items:center;column-gap:var(--ddm-apa-qty-label-gap);row-gap:var(--ddm-apa-qty-label-gap);flex-wrap:wrap;}';
-		echo $scoped_id . ' .ddm-apa-qty-wrap--label-top{flex-direction:column;align-items:flex-start;}';
-		echo $scoped_id . ' .ddm-apa-qty-field{display:block;width:var(--ddm-apa-qty-width);min-height:44px;border:1px solid #d7d7d7;background:#f4f4f4;overflow:hidden;}';
-		echo $scoped_id . ' .ddm-apa-qty-field-inner{display:flex;align-items:center;justify-content:space-between;gap:var(--ddm-apa-qty-inner-gap);}';
-		echo $scoped_id . ' .ddm-apa-qty-btn{width:46px;min-height:44px;border:0;background:transparent;color:#8d8d8d;line-height:1;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center;transition:color 180ms ease,background-color 180ms ease;}';
-		echo $scoped_id . ' .ddm-apa-qty-btn:hover,' . $scoped_id . ' .ddm-apa-qty-btn:focus-visible{color:#44596f;background:rgba(0,0,0,0.03);outline:none;}';
-		echo $scoped_id . ' .ddm-apa-qty-btn .ddm-apa-qty-btn-icon,' . $scoped_id . ' .ddm-apa-qty-btn .ddm-apa-qty-btn-icon i,' . $scoped_id . ' .ddm-apa-qty-btn .ddm-apa-qty-btn-icon svg{font-size:var(--ddm-apa-icon-size);width:var(--ddm-apa-icon-size);height:var(--ddm-apa-icon-size);line-height:1;}';
-		echo $scoped_id . ' .ddm-apa-qty-input{flex:1 1 auto;min-width:0;height:44px;border:0;background:transparent;text-align:center;font-size:28px;font-weight:600;color:#5f738a;padding:0 4px;appearance:textfield;-moz-appearance:textfield;}';
+		echo $scoped_id . ' .ddm-apa-qty-wrap{display:grid;align-items:center;column-gap:var(--ddm-apa-qty-label-gap);row-gap:var(--ddm-apa-qty-label-gap);width:100%;}';
+		echo $scoped_id . ' .ddm-apa-qty-wrap--label-left{grid-template-columns:auto minmax(0,1fr);}';
+		echo $scoped_id . ' .ddm-apa-qty-wrap--label-right{grid-template-columns:minmax(0,1fr) auto;}';
+		echo $scoped_id . ' .ddm-apa-qty-wrap--label-top{grid-template-columns:minmax(0,1fr);}';
+		echo $scoped_id . ' .ddm-apa-qty-wrap--no-label{grid-template-columns:minmax(0,1fr);}';
+		echo $scoped_id . ' .ddm-apa-qty-wrap .advanced-qty-notice{grid-column:1/-1;}';
+		echo $scoped_id . ' .ddm-apa-qty-field{display:block;width:var(--ddm-apa-qty-width);max-width:100%;min-height:42px;overflow:hidden;border:1px solid #ced4dc;border-radius:0;background-color:#ffffff;}';
+		echo $scoped_id . ' .ddm-apa-qty-field-inner{display:flex;align-items:center;justify-content:space-between;gap:var(--ddm-apa-qty-inner-gap);min-height:42px;}';
+		echo $scoped_id . ' .ddm-apa-qty-btn{width:48px;min-height:42px;border:0;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#9ca3af;background:transparent;transition:color 180ms ease,background-color 180ms ease;}';
+		echo $scoped_id . ' .ddm-apa-qty-btn:focus-visible{outline:none;}';
+		echo $scoped_id . ' .ddm-apa-qty-btn .ddm-apa-qty-btn-icon,' . $scoped_id . ' .ddm-apa-qty-btn .ddm-apa-qty-btn-icon i,' . $scoped_id . ' .ddm-apa-qty-btn .ddm-apa-qty-btn-icon svg{font-size:var(--ddm-apa-icon-size);width:var(--ddm-apa-icon-size);height:var(--ddm-apa-icon-size);line-height:1;font-weight:400;}';
+		echo $scoped_id . ' .ddm-apa-qty-input{flex:1 1 auto;min-width:0;height:42px;border:0;text-align:center;appearance:textfield;-moz-appearance:textfield;padding:0 6px;background:transparent;color:#5f748b;font-size:22px;line-height:1.2;font-weight:500;}';
 		echo $scoped_id . ' .ddm-apa-qty-input::-webkit-outer-spin-button,' . $scoped_id . ' .ddm-apa-qty-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}';
-		echo $scoped_id . ' .ddm-apa-notice{display:block;margin-top:8px;padding:8px 12px;font-size:13px;line-height:1.4;color:#991b1b;background:#fef2f2;border:1px solid #fecaca;}';
-		echo $scoped_id . ' .ddm-apa-notice[hidden]{display:none!important;}';
+		echo $scoped_id . ' .advanced-qty-notice{margin-top:8px;padding:8px 12px;font-size:13px;line-height:1.4;color:#991b1b;background:#fef2f2;border:1px solid #fecaca;}';
 		if ( ! $has_bg ) {
 			echo $scoped_id . ' .ddm-apa-custom-action-btn{background-color:' . esc_attr( $custom_bg ) . ';color:' . esc_attr( $custom_tx ) . ';}';
 		}
@@ -1630,12 +1759,15 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 	private function render_inline_script( $instance_id ) {
 		echo '<script>';
 		echo '(function(){';
+		echo 'function init(){';
 		echo 'var root=document.getElementById(' . wp_json_encode( $instance_id ) . ');';
 		echo 'if(!root||root.dataset.ddmApaInit==="yes"){return;}';
 		echo 'root.dataset.ddmApaInit="yes";';
+		echo 'var container=root.closest(".elementor-widget-devsroom_advanced_product_actions")||root;';
 		echo 'var customButton=root.querySelector(".ddm-apa-custom-action-btn");';
 		echo 'var qtyButtons=root.querySelectorAll(".ddm-apa-qty-btn");';
-		echo 'var noticeBox=root.querySelector(".ddm-apa-notice");';
+		echo 'var noticeBox=root.querySelector(".advanced-qty-notice");';
+		echo 'var qtyInput=root.querySelector("input.qty[name=\\"quantity\\"],input[name=\\"quantity\\"]");';
 		echo 'var addToCartButtons=root.querySelectorAll(".ddm-apa-cart-area .single_add_to_cart_button");';
 		echo 'var actionType=(root.dataset.actionType||"whatsapp").trim();';
 		echo 'var whatsappPhone=(root.dataset.whatsappPhone||"").trim();';
@@ -1644,38 +1776,115 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 		echo 'var fallbackName=root.dataset.fallbackName||"";';
 		echo 'var fallbackPrice=root.dataset.fallbackPrice||"";';
 		echo 'var fallbackUrl=root.dataset.fallbackUrl||window.location.href;';
+		echo 'var showAddToCart=root.dataset.showAddToCart==="yes";';
 		echo 'var addToCartText=(root.dataset.addToCartText||"").trim();';
+		echo 'var addCartRedirect=(root.dataset.addCartRedirect||"").trim();';
 		echo 'var addCartAnimation=(root.dataset.addCartAnimation||"").trim();';
 		echo 'var maxLimitEnabled=root.dataset.enableMaxLimit==="yes";';
 		echo 'var minQty=parseInt(root.dataset.minQty||"1",10);';
-		echo 'var maxQty=parseInt(root.dataset.maxQty||"10",10);';
+		echo 'var maxQty=parseInt(root.dataset.maxLimit||root.dataset.maxQty||"0",10);';
+		echo 'var inputMax=parseInt((qtyInput&&qtyInput.dataset.maxLimit)||"",10);';
+		echo 'var maxLimit=Number.isFinite(inputMax)&&inputMax>0?inputMax:(Number.isFinite(maxQty)&&maxQty>0?maxQty:null);';
 		echo 'var maxNoticeTemplate=root.dataset.maxNoticeTemplate||"";';
-		echo 'var maxNoticeFallback=root.dataset.maxNoticeText||("Maximum quantity allowed is "+maxQty+".");';
+		echo 'var maxNoticeFallback=root.dataset.maxNoticeText||("Maximum quantity allowed is "+(maxLimit||"")+".");';
 		echo 'var missingActionAlert=root.dataset.alertActionMissing||"Please configure a phone number or Messenger page ID.";';
+		echo 'var redirectStorageKey="ddmApaRedirect:"+root.id;';
+		echo 'var redirectTTL=60000;';
 		echo 'if(!Number.isFinite(minQty)||minQty<1){minQty=1;}';
-		echo 'if(!Number.isFinite(maxQty)||maxQty<minQty){maxQty=minQty;}';
 		echo 'Array.prototype.forEach.call(addToCartButtons,function(button){';
 		echo 'if(!addToCartText){return;}';
+		echo 'button.classList.add("ddm-apa-add-to-cart");';
 		echo 'if(button.tagName==="INPUT"){button.value=addToCartText;}else{button.textContent=addToCartText;}';
 		echo 'if(addCartAnimation){button.classList.add("elementor-animation-"+addCartAnimation);}';
 		echo '});';
+		echo 'function hasAddSuccessSignal(){';
+		echo 'if(window.location&&window.location.search){';
+		echo 'var params=new URLSearchParams(window.location.search);';
+		echo 'if(params.has("add-to-cart")||params.has("added-to-cart")){return true;}';
+		echo '}';
+		echo 'var notices=document.querySelectorAll(".woocommerce-message,.woocommerce-notices-wrapper .woocommerce-message");';
+		echo 'return notices.length>0;';
+		echo '}';
+		echo 'function setRedirectPending(){';
+		echo 'if(!addCartRedirect){return;}';
+		echo 'try{sessionStorage.setItem(redirectStorageKey,JSON.stringify({url:addCartRedirect,time:Date.now()}));}catch(e){}';
+		echo '}';
+		echo 'function clearRedirectPending(){';
+		echo 'try{sessionStorage.removeItem(redirectStorageKey);}catch(e){}';
+		echo '}';
+		echo 'function maybeRedirectFromPending(){';
+		echo 'if(!addCartRedirect){return;}';
+		echo 'try{';
+		echo 'var raw=sessionStorage.getItem(redirectStorageKey);';
+		echo 'if(!raw){return;}';
+		echo 'var data=JSON.parse(raw)||{};';
+		echo 'if(!data.time||Date.now()-Number(data.time)>redirectTTL){clearRedirectPending();return;}';
+		echo 'if(hasAddSuccessSignal()){clearRedirectPending();window.location.assign(addCartRedirect);}';
+		echo '}catch(e){clearRedirectPending();}';
+		echo '}';
+		echo 'maybeRedirectFromPending();';
 		echo 'function getMaxNoticeMessage(){';
-		echo 'var message=(maxNoticeTemplate||"").split("{max}").join(String(maxQty));';
+		echo 'var maxValue=maxLimit===null?"":String(maxLimit);';
+		echo 'var message=(maxNoticeTemplate||"").split("{max}").join(maxValue);';
 		echo 'if(!message){message=maxNoticeFallback||"";}';
 		echo 'return message;';
 		echo '}';
-		echo 'function setNotice(message){';
+		echo 'function setNotice(show,message){';
 		echo 'if(!noticeBox){return;}';
-		echo 'if(message){noticeBox.textContent=message;noticeBox.hidden=false;return;}';
-		echo 'noticeBox.textContent="";';
-		echo 'noticeBox.hidden=true;';
+		echo 'if(show){noticeBox.textContent=message||getMaxNoticeMessage();noticeBox.style.display="block";return;}';
+		echo 'noticeBox.style.display="none";';
+		echo '}';
+		echo 'function getInputValue(input){';
+		echo 'var value=parseFloat((input.value||"").trim());';
+		echo 'return Number.isFinite(value)?value:minQty;';
+		echo '}';
+		echo 'function applyInputValue(input,value){';
+		echo 'input.value=String(value);';
+		echo 'input.dispatchEvent(new Event("change",{bubbles:true}));';
+		echo '}';
+		echo 'function validateManualInput(input){';
+		echo 'var value=getInputValue(input);';
+		echo 'if(value<minQty){applyInputValue(input,minQty);setNotice(false,"");return false;}';
+		echo 'if(maxLimitEnabled&&maxLimit!==null&&value>maxLimit){applyInputValue(input,maxLimit);setNotice(true,getMaxNoticeMessage());return false;}';
+		echo 'setNotice(false,"");';
+		echo 'return true;';
+		echo '}';
+		echo 'function stepQuantity(button){';
+		echo 'var field=button.closest(".ddm-apa-qty-field");';
+		echo 'if(!field){return;}';
+		echo 'var input=field.querySelector("input.qty,input[name=\\"quantity\\"]");';
+		echo 'if(!input){return;}';
+		echo 'var step=parseInt(button.dataset.qtyStep||"0",10);';
+		echo 'if(!Number.isFinite(step)||0===step){return;}';
+		echo 'var current=getInputValue(input);';
+		echo 'if(step>0){';
+		echo 'var increased=current+step;';
+		echo 'if(maxLimitEnabled&&maxLimit!==null&&increased>maxLimit){';
+		echo 'applyInputValue(input,maxLimit);';
+		echo 'setNotice(true,getMaxNoticeMessage());';
+		echo 'return;';
+		echo '}';
+		echo 'applyInputValue(input,increased);';
+		echo 'setNotice(false,"");';
+		echo 'return;';
+		echo '}';
+		echo 'var decreased=current+step;';
+		echo 'if(decreased<minQty){decreased=minQty;}';
+		echo 'applyInputValue(input,decreased);';
+		echo 'if(!maxLimitEnabled||maxLimit===null||decreased<=maxLimit){setNotice(false,"");}';
 		echo '}';
 		echo 'function readFirstText(selectors,fallback){';
 		echo 'for(var i=0;i<selectors.length;i++){';
-		echo 'var node=document.querySelector(selectors[i]);';
-		echo 'if(!node){continue;}';
-		echo 'var text=(node.textContent||node.innerText||"").replace(/\\s+/g," ").trim();';
-		echo 'if(text){return text;}';
+		echo 'var localNode=container.querySelector(selectors[i]);';
+		echo 'if(localNode){';
+		echo 'var localText=(localNode.textContent||localNode.innerText||"").replace(/\\s+/g," ").trim();';
+		echo 'if(localText){return localText;}';
+		echo '}';
+		echo 'var globalNode=document.querySelector(selectors[i]);';
+		echo 'if(globalNode){';
+		echo 'var globalText=(globalNode.textContent||globalNode.innerText||"").replace(/\\s+/g," ").trim();';
+		echo 'if(globalText){return globalText;}';
+		echo '}';
 		echo '}';
 		echo 'return fallback||"";';
 		echo '}';
@@ -1686,32 +1895,7 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 		echo 'output=output.split("{product_url}").join(data.product_url||"");';
 		echo 'return output;';
 		echo '}';
-		echo 'function stepQuantity(button){';
-		echo 'var field=button.closest(".ddm-apa-qty-field");';
-		echo 'if(!field){return;}';
-		echo 'var input=field.querySelector("input.qty,input[name=\\"quantity\\"]");';
-		echo 'if(!input){return;}';
-		echo 'var step=parseInt(button.dataset.qtyStep||"0",10);';
-		echo 'if(!Number.isFinite(step)||0===step){return;}';
-		echo 'var inputMin=parseInt(input.getAttribute("min")||"",10);';
-		echo 'var inputMax=parseInt(input.getAttribute("max")||"",10);';
-		echo 'var localMin=Number.isFinite(inputMin)?inputMin:minQty;';
-		echo 'var localMax=Number.isFinite(inputMax)?inputMax:maxQty;';
-		echo 'if(localMax<localMin){localMax=localMin;}';
-		echo 'var current=parseInt((input.value||"").trim(),10);';
-		echo 'if(!Number.isFinite(current)){current=localMin;}';
-		echo 'var next=current+step;';
-		echo 'if(next<localMin){next=localMin;}';
-		echo 'if(next>localMax){next=localMax;}';
-		echo 'input.value=String(next);';
-		echo 'input.dispatchEvent(new Event("change",{bubbles:true}));';
-		echo 'setNotice("");';
-		echo '}';
 		echo 'function buildDynamicMessage(){';
-		echo '/*';
-		echo ' Build message from live DOM values so the outgoing link reflects current product context.';
-		echo ' Placeholders are replaced with title, price, and URL values at click time.';
-		echo '*/';
 		echo 'var productName=readFirstText([".product_title","h1.product_title","[itemprop=\\"name\\"]"],fallbackName);';
 		echo 'var productPrice=readFirstText([".summary .price",".product .price",".price"],fallbackPrice);';
 		echo 'var productUrl=window.location.href||fallbackUrl;';
@@ -1737,40 +1921,27 @@ class DDM_Advanced_Product_Actions_Widget extends Widget_Base {
 		echo 'Array.prototype.forEach.call(qtyButtons,function(button){';
 		echo 'button.addEventListener("click",function(event){event.preventDefault();stepQuantity(button);});';
 		echo '});';
-		echo 'function validateQuantityScope(scope){';
-		echo 'var inputs=scope.querySelectorAll("input.qty,input[name=\\"quantity\\"]");';
-		echo 'for(var i=0;i<inputs.length;i++){';
-		echo 'var input=inputs[i];';
-		echo 'var raw=(input.value||"").trim();';
-		echo 'if(!raw){continue;}';
-		echo 'var value=parseFloat(raw);';
-		echo 'if(!Number.isFinite(value)){continue;}';
-		echo 'if(value<minQty){input.value=minQty;setNotice("");return false;}';
-		echo 'if(maxLimitEnabled&&value>maxQty){input.value=maxQty;setNotice(getMaxNoticeMessage());return false;}';
-		echo '}';
-		echo 'setNotice("");';
-		echo 'return true;';
-		echo '}';
 		echo 'var forms=root.querySelectorAll("form");';
 		echo 'Array.prototype.forEach.call(forms,function(form){';
 		echo 'form.addEventListener("submit",function(event){';
-		echo 'if(!validateQuantityScope(form)){event.preventDefault();event.stopPropagation();}';
+		echo 'var formInput=form.querySelector("input.qty,input[name=\\"quantity\\"]");';
+		echo 'if(formInput&&!validateManualInput(formInput)){event.preventDefault();event.stopPropagation();return;}';
+		echo 'if(showAddToCart&&addCartRedirect){setRedirectPending();}';
 		echo '});';
 		echo '});';
-		echo 'var qtyInputs=root.querySelectorAll("input.qty,input[name=\\"quantity\\"]");';
-		echo 'Array.prototype.forEach.call(qtyInputs,function(input){';
-		echo 'input.addEventListener("input",function(){';
-		echo 'var value=parseFloat((input.value||"").trim());';
-		echo 'if(Number.isFinite(value)&&value<=maxQty){setNotice("");}';
+		echo 'if(qtyInput){';
+		echo 'qtyInput.addEventListener("input",function(){validateManualInput(qtyInput);});';
+		echo 'qtyInput.addEventListener("change",function(){validateManualInput(qtyInput);});';
+		echo '}';
+		echo 'if(showAddToCart&&addCartRedirect&&window.jQuery&&window.jQuery(document.body).on){';
+		echo 'window.jQuery(document.body).on("added_to_cart.ddmApa"+root.id,function(event,fragments,cartHash,$button){';
+		echo 'if($button&&$button.length&&$button.closest("#"+root.id).length===0){return;}';
+		echo 'clearRedirectPending();';
+		echo 'window.location.assign(addCartRedirect);';
 		echo '});';
-		echo 'input.addEventListener("change",function(){';
-		echo 'var value=parseFloat((input.value||"").trim());';
-		echo 'if(!Number.isFinite(value)){return;}';
-		echo 'if(value<minQty){input.value=minQty;setNotice("");return;}';
-		echo 'if(maxLimitEnabled&&value>maxQty){input.value=maxQty;setNotice(getMaxNoticeMessage());return;}';
-		echo 'setNotice("");';
-		echo '});';
-		echo '});';
+		echo '}';
+		echo '}';
+		echo 'if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",init);}else{init();}';
 		echo '})();';
 		echo '</script>';
 	}
