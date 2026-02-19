@@ -100,6 +100,21 @@ class DDM_Plugin {
 			DDM_VERSION,
 			true
 		);
+
+		wp_register_style(
+			'ddm-woo-product-tabs',
+			DDM_URL . 'assets/css/ddm-woo-product-tabs.css',
+			array(),
+			DDM_VERSION
+		);
+
+		wp_register_script(
+			'ddm-woo-product-tabs',
+			DDM_URL . 'assets/js/ddm-woo-product-tabs.js',
+			array(),
+			DDM_VERSION,
+			true
+		);
 	}
 
 	/**

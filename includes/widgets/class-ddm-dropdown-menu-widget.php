@@ -447,15 +447,17 @@ class DDM_Dropdown_Menu_Widget extends Widget_Base {
 			)
 		);
 
-		$this->add_control(
-			'custom_css',
-			array(
-				'label'       => __( 'Custom CSS', 'devsroom-dropdown-menu' ),
-				'type'        => Controls_Manager::TEXTAREA,
-				'description' => __( 'Use CSS declarations, or full rules using "selector" as the widget wrapper token.', 'devsroom-dropdown-menu' ),
-				'rows'        => 6,
-			)
-		);
+		if ( ! $this->is_elementor_pro_active() ) {
+			$this->add_control(
+				'custom_css',
+				array(
+					'label'       => __( 'Custom CSS', 'devsroom-dropdown-menu' ),
+					'type'        => Controls_Manager::TEXTAREA,
+					'description' => __( 'Use CSS declarations, or full rules using "selector" as the widget wrapper token.', 'devsroom-dropdown-menu' ),
+					'rows'        => 6,
+				)
+			);
+		}
 
 		$this->add_control(
 			'custom_js',
@@ -1270,7 +1272,9 @@ class DDM_Dropdown_Menu_Widget extends Widget_Base {
 		echo '</div>';
 		echo '</div>';
 
-		$this->render_custom_css( $settings['custom_css'] ?? '', $instance_id );
+		if ( ! $this->is_elementor_pro_active() ) {
+			$this->render_custom_css( $settings['custom_css'] ?? '', $instance_id );
+		}
 		$this->render_custom_js( $settings['custom_js'] ?? '', $instance_id );
 	}
 
@@ -1727,6 +1731,15 @@ class DDM_Dropdown_Menu_Widget extends Widget_Base {
 		echo $custom_js; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo '})();';
 		echo '</script>';
+	}
+
+	/**
+	 * Determines whether Elementor Pro is active.
+	 *
+	 * @return bool
+	 */
+	private function is_elementor_pro_active() {
+		return defined( 'ELEMENTOR_PRO_VERSION' ) && class_exists( '\ElementorPro\Plugin' );
 	}
 
 	/**
