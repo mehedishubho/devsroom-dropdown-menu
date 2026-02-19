@@ -2,6 +2,83 @@
 
 All notable changes to the Devsroom Custom Toolkit plugin will be documented in this file.
 
+## [1.4.3] - 2026-02-19
+
+### 🎉 Critical Fix Release - Tab Item Styling & Third-Party Tab Support
+
+This release addresses critical issues with the WooCommerce Product Tabs widget, fixing tab item color styling and enhancing third-party tab plugin compatibility.
+
+### ✨ New Features
+
+#### WooCommerce Product Tabs Widget
+
+- **Third-Party Tab Plugin Support**: Automatically fetches ALL registered WooCommerce tabs using `apply_filters('woocommerce_product_tabs', array())` for full compatibility with third-party tab plugins
+- **Enhanced Tab Fetching**: Third-party tabs are automatically included when using WooCommerce Default source mode
+- **Comprehensive Tab State Styling**: Added separate styling controls for all three states:
+  - Normal state styling (text color, background color, border)
+  - Hover state styling (text color, background color, border color)
+  - Active state styling (text color, background color, border color, border weight)
+
+### 🐛 Bug Fixes
+
+#### WooCommerce Product Tabs Widget
+
+- **CRITICAL FIX**: Resolved tab item text color and background color not applying correctly
+- Fixed CSS selectors to match HTML structure exactly (`.ddm-woo-product-tabs__tab`)
+- Updated tab item color controls to use direct selectors instead of CSS variables
+- Fixed tab item hover state colors not working
+- Fixed tab item active state colors not working
+- Resolved tab item border color controls not applying to hover/active states
+- Fixed icon color styling not applying correctly to active tabs
+- Fixed active tab border weight control not working
+
+#### CSS Improvements
+
+- Enhanced CSS specificity to override default theme and WooCommerce styles
+- Removed CSS variable approach in favor of direct selectors for better compatibility
+- Improved tab button styling with proper appearance reset
+- Enhanced focus state styling for keyboard navigation
+- Fixed sticky navigation background color not applying correctly
+- Improved responsive design for mobile devices
+
+#### JavaScript Improvements
+
+- Enhanced sticky navigation state management with requestAnimationFrame for performance
+- Fixed sticky state not updating correctly on scroll
+- Improved tab switching performance
+- Added proper cleanup for event listeners on widget destruction
+- Enhanced keyboard navigation with better focus management
+
+### 🔧 Technical Improvements
+
+- **Direct CSS Selectors**: All style controls now use direct selectors matching HTML structure
+- **Enhanced Specificity**: Widget styles now properly override theme and WooCommerce defaults
+- **Performance Optimization**: Sticky navigation uses requestAnimationFrame for smooth 60fps updates
+- **Accessibility Improvements**: Enhanced focus states and keyboard navigation
+- **Code Quality**: Improved code documentation and comments
+- **Security**: Maintained strict input sanitization and output escaping
+
+### 📦 Dependencies
+
+- WordPress 6.0+ (tested up to 6.6)
+- PHP 8.0+ (recommended 8.1+)
+- Elementor 3.0+ (tested up to 3.20+)
+- WooCommerce 6.0+ (tested up to 8.5+)
+
+### 🔄 Breaking Changes
+
+None. This release maintains full backward compatibility with version 1.4.2.
+
+### 📝 Migration Notes
+
+No migration required. Simply update to version 1.4.3 for automatic improvements. All existing widget settings remain compatible.
+
+### 🙏 Acknowledgments
+
+Special thanks to users who reported the tab item styling issues and provided feedback on third-party tab plugin compatibility. Your input helped us identify and fix these critical issues.
+
+---
+
 ## [1.4.1] - 2026-02-19
 
 ### 🎉 Patch Release - Performance & Stability Improvements
