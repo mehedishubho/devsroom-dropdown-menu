@@ -2,11 +2,17 @@
 	'use strict';
 
 	var WIDGET_SELECTOR = '.ddm-woo-product-tabs';
+	var PANEL_WRAP_SELECTOR = '.ddm-woo-product-tabs__panel-wrap';
 	var TAB_SELECTOR = '.ddm-woo-product-tabs__tab[role="tab"]';
 	var PANEL_SELECTOR = '.ddm-woo-product-tabs__panel[role="tabpanel"]';
 
 	function toArray(nodeList) {
 		return Array.prototype.slice.call(nodeList || []);
+	}
+
+	function toInt(value, fallback) {
+		var parsed = parseInt(value, 10);
+		return Number.isFinite(parsed) ? parsed : fallback;
 	}
 
 	function getHashId() {
@@ -26,7 +32,7 @@
 			var urlWithoutHash = window.location.href.split('#')[0];
 			window.history.replaceState(null, '', urlWithoutHash + '#' + hashId);
 		} catch (error) {
-			// Silently ignore URL write failures.
+			// Ignore URL write failures.
 		}
 	}
 
@@ -78,6 +84,59 @@
 		return (currentIndex - 1 + total) % total;
 	}
 
+	function initStickyState(root, panelWrap) {
+		if (!panelWrap || panelWrap.dataset.stickyEnabled !== 'yes') {
+			return;
+		}
+
+		var stickyPosition = panelWrap.dataset.stickyPosition === 'bottom' ? 'bottom' : 'top';
+		var stickyOffset = Math.max(0, toInt(panelWrap.dataset.stickyOffset, 0));
+		var rafId = 0;
+
+		function evaluateStickyState() {
+			rafId = 0;
+
+			if (!root.isConnected || !panelWrap.isConnected) {
+				panelWrap.classList.remove('is-sticky');
+				return;
+			}
+
+			var wrapRect = panelWrap.getBoundingClientRect();
+			var rootRect = root.getBoundingClientRect();
+			var wrapHeight = panelWrap.offsetHeight || wrapRect.height || 0;
+			var threshold = 1;
+			var isSticky = false;
+
+			if (stickyPosition === 'top') {
+				var reachedTop = wrapRect.top <= stickyOffset + threshold;
+				var withinBoundsTop = rootRect.bottom > stickyOffset + wrapHeight;
+				isSticky = reachedTop && withinBoundsTop;
+			} else {
+				var viewportBottomLine = window.innerHeight - stickyOffset;
+				var reachedBottom = wrapRect.bottom >= viewportBottomLine - threshold;
+				var withinTopLimit = rootRect.top < viewportBottomLine - wrapHeight;
+				var withinBottomLimit = rootRect.bottom > stickyOffset + wrapHeight;
+				isSticky = reachedBottom && withinTopLimit && withinBottomLimit;
+			}
+
+			panelWrap.classList.toggle('is-sticky', isSticky);
+		}
+
+		function scheduleStickyStateCheck() {
+			if (rafId) {
+				return;
+			}
+
+			rafId = window.requestAnimationFrame(evaluateStickyState);
+		}
+
+		window.addEventListener('scroll', scheduleStickyStateCheck, { passive: true });
+		window.addEventListener('resize', scheduleStickyStateCheck);
+		window.addEventListener('orientationchange', scheduleStickyStateCheck);
+
+		scheduleStickyStateCheck();
+	}
+
 	function initWidget(root) {
 		if (!root || root.dataset.ddmWooTabsInit === 'yes') {
 			return;
@@ -85,6 +144,8 @@
 
 		var tabs = toArray(root.querySelectorAll(TAB_SELECTOR));
 		var panels = toArray(root.querySelectorAll(PANEL_SELECTOR));
+		var panelWrap = root.querySelector(PANEL_WRAP_SELECTOR);
+
 		if (!tabs.length || !panels.length) {
 			return;
 		}
@@ -94,6 +155,7 @@
 		var initialHashId = getHashId();
 		var initialTab = initialHashId ? findTabByTarget(tabs, initialHashId) : null;
 		var defaultActiveTab = tabs[0];
+
 		for (var i = 0; i < tabs.length; i++) {
 			if (tabs[i].classList.contains('is-active')) {
 				defaultActiveTab = tabs[i];
@@ -134,6 +196,7 @@
 				}
 
 				event.preventDefault();
+
 				var nextTab = tabs[nextIndex];
 				if (!nextTab) {
 					return;
@@ -157,6 +220,8 @@
 
 			activateTab(root, tabs, panels, matchingTab, false);
 		});
+
+		initStickyState(root, panelWrap);
 	}
 
 	function initScope(scope) {
@@ -181,3 +246,4 @@
 		bootstrap();
 	}
 })();
+

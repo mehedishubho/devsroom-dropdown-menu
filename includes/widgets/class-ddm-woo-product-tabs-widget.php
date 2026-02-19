@@ -8,6 +8,9 @@
 namespace Devsroom\DropdownMenu\Widgets;
 
 use Elementor\Controls_Manager;
+use Elementor\Group_Control_Border;
+use Elementor\Group_Control_Box_Shadow;
+use Elementor\Group_Control_Typography;
 use Elementor\Icons_Manager;
 use Elementor\Repeater;
 use Elementor\Widget_Base;
@@ -84,6 +87,9 @@ class DDM_Woo_Product_Tabs_Widget extends Widget_Base {
 		$this->register_tabs_items_controls();
 		$this->register_tabs_panel_layout_controls();
 		$this->register_tabs_content_layout_controls();
+		$this->register_panel_style_controls();
+		$this->register_tab_item_style_controls();
+		$this->register_content_style_controls();
 	}
 
 	/**
@@ -129,24 +135,94 @@ class DDM_Woo_Product_Tabs_Widget extends Widget_Base {
 		);
 
 		$this->add_control(
+			'tab_source',
+			array(
+				'label'   => __( 'Tab Source', 'devsroom-dropdown-menu' ),
+				'type'    => Controls_Manager::SELECT,
+				'options' => array(
+					'woocommerce_default' => __( 'WooCommerce Default', 'devsroom-dropdown-menu' ),
+					'custom'              => __( 'Custom', 'devsroom-dropdown-menu' ),
+				),
+				'default' => 'custom',
+			)
+		);
+
+		$this->add_control(
+			'wc_tab_description_enable',
+			array(
+				'label'        => __( 'Description Tab', 'devsroom-dropdown-menu' ),
+				'type'         => Controls_Manager::SWITCHER,
+				'label_on'     => __( 'Show', 'devsroom-dropdown-menu' ),
+				'label_off'    => __( 'Hide', 'devsroom-dropdown-menu' ),
+				'return_value' => 'yes',
+				'default'      => 'yes',
+				'condition'    => array(
+					'tab_source' => 'woocommerce_default',
+				),
+			)
+		);
+
+		$this->add_control(
+			'wc_tab_additional_info_enable',
+			array(
+				'label'        => __( 'Additional Info Tab', 'devsroom-dropdown-menu' ),
+				'type'         => Controls_Manager::SWITCHER,
+				'label_on'     => __( 'Show', 'devsroom-dropdown-menu' ),
+				'label_off'    => __( 'Hide', 'devsroom-dropdown-menu' ),
+				'return_value' => 'yes',
+				'default'      => 'yes',
+				'condition'    => array(
+					'tab_source' => 'woocommerce_default',
+				),
+			)
+		);
+
+		$this->add_control(
+			'wc_tab_reviews_enable',
+			array(
+				'label'        => __( 'Reviews Tab', 'devsroom-dropdown-menu' ),
+				'type'         => Controls_Manager::SWITCHER,
+				'label_on'     => __( 'Show', 'devsroom-dropdown-menu' ),
+				'label_off'    => __( 'Hide', 'devsroom-dropdown-menu' ),
+				'return_value' => 'yes',
+				'default'      => 'yes',
+				'condition'    => array(
+					'tab_source' => 'woocommerce_default',
+				),
+			)
+		);
+
+		$this->add_control(
 			'tabs_items',
 			array(
 				'label'       => __( 'Tabs', 'devsroom-dropdown-menu' ),
 				'type'        => Controls_Manager::REPEATER,
 				'fields'      => $repeater->get_controls(),
+				'default'     => array(
+					array(
+						'tab_title'   => __( 'Tab Title', 'devsroom-dropdown-menu' ),
+						'tab_content' => __( 'Add your tab content here.', 'devsroom-dropdown-menu' ),
+					),
+				),
 				'title_field' => '{{{ tab_title }}}',
+				'condition'   => array(
+					'tab_source' => 'custom',
+				),
 			)
 		);
 
 		$this->add_control(
 			'enable_woo_fallback',
 			array(
-				'label'        => __( 'Fallback To WooCommerce Tabs', 'devsroom-dropdown-menu' ),
+				'label'        => __( 'Fallback To WooCommerce Tabs If Custom Is Empty', 'devsroom-dropdown-menu' ),
 				'type'         => Controls_Manager::SWITCHER,
 				'label_on'     => __( 'Yes', 'devsroom-dropdown-menu' ),
 				'label_off'    => __( 'No', 'devsroom-dropdown-menu' ),
 				'return_value' => 'yes',
 				'default'      => 'yes',
+				'condition'    => array(
+					'tab_source' => 'custom',
+				),
 			)
 		);
 
@@ -198,6 +274,57 @@ class DDM_Woo_Product_Tabs_Widget extends Widget_Base {
 				),
 				'condition'  => array(
 					'tabs_panel_width_mode' => 'custom',
+				),
+			)
+		);
+
+		$this->add_control(
+			'tabs_panel_sticky_enable',
+			array(
+				'label'        => __( 'Enable Sticky', 'devsroom-dropdown-menu' ),
+				'type'         => Controls_Manager::SWITCHER,
+				'label_on'     => __( 'Yes', 'devsroom-dropdown-menu' ),
+				'label_off'    => __( 'No', 'devsroom-dropdown-menu' ),
+				'return_value' => 'yes',
+				'default'      => '',
+			)
+		);
+
+		$this->add_control(
+			'tabs_panel_sticky_position',
+			array(
+				'label'     => __( 'Sticky Position', 'devsroom-dropdown-menu' ),
+				'type'      => Controls_Manager::SELECT,
+				'options'   => array(
+					'top'    => __( 'Top', 'devsroom-dropdown-menu' ),
+					'bottom' => __( 'Bottom', 'devsroom-dropdown-menu' ),
+				),
+				'default'   => 'top',
+				'condition' => array(
+					'tabs_panel_sticky_enable' => 'yes',
+				),
+			)
+		);
+
+		$this->add_control(
+			'tabs_panel_sticky_offset',
+			array(
+				'label'      => __( 'Sticky Offset', 'devsroom-dropdown-menu' ),
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array(
+					'px' => array(
+						'min'  => 0,
+						'max'  => 300,
+						'step' => 1,
+					),
+				),
+				'default'    => array(
+					'size' => 0,
+					'unit' => 'px',
+				),
+				'condition'  => array(
+					'tabs_panel_sticky_enable' => 'yes',
 				),
 			)
 		);
@@ -258,6 +385,469 @@ class DDM_Woo_Product_Tabs_Widget extends Widget_Base {
 	}
 
 	/**
+	 * Registers panel container style controls.
+	 *
+	 * @return void
+	 */
+	private function register_panel_style_controls() {
+		$this->start_controls_section(
+			'section_style_panel_container',
+			array(
+				'label' => __( 'Tabs Navigation Container', 'devsroom-dropdown-menu' ),
+				'tab'   => Controls_Manager::TAB_STYLE,
+			)
+		);
+
+		$this->add_control(
+			'panel_bg_color',
+			array(
+				'label'     => __( 'Background Color', 'devsroom-dropdown-menu' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ddm-woo-product-tabs' => '--ddm-tabs-panel-bg: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'panel_sticky_bg_color',
+			array(
+				'label'     => __( 'Sticky Background Color', 'devsroom-dropdown-menu' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ddm-woo-product-tabs' => '--ddm-tabs-panel-sticky-bg: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Border::get_type(),
+			array(
+				'name'     => 'panel_border',
+				'selector' => '{{WRAPPER}} .ddm-woo-product-tabs__panel-inner',
+			)
+		);
+
+		$this->add_responsive_control(
+			'panel_border_radius',
+			array(
+				'label'      => __( 'Border Radius', 'devsroom-dropdown-menu' ),
+				'type'       => Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px', '%' ),
+				'selectors'  => array(
+					'{{WRAPPER}} .ddm-woo-product-tabs__panel-inner' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Box_Shadow::get_type(),
+			array(
+				'name'     => 'panel_shadow',
+				'selector' => '{{WRAPPER}} .ddm-woo-product-tabs__panel-inner',
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Box_Shadow::get_type(),
+			array(
+				'name'     => 'panel_sticky_shadow',
+				'label'    => __( 'Sticky Box Shadow', 'devsroom-dropdown-menu' ),
+				'selector' => '{{WRAPPER}} .ddm-woo-product-tabs__panel-wrap.panel-sticky.is-sticky .ddm-woo-product-tabs__panel-inner',
+			)
+		);
+
+		$this->add_responsive_control(
+			'panel_padding',
+			array(
+				'label'      => __( 'Padding', 'devsroom-dropdown-menu' ),
+				'type'       => Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px', 'em', '%' ),
+				'selectors'  => array(
+					'{{WRAPPER}} .ddm-woo-product-tabs__panel-inner' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'panel_margin',
+			array(
+				'label'      => __( 'Margin', 'devsroom-dropdown-menu' ),
+				'type'       => Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px', 'em', '%' ),
+				'selectors'  => array(
+					'{{WRAPPER}} .ddm-woo-product-tabs__panel-wrap' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->end_controls_section();
+	}
+
+	/**
+	 * Registers tab item style controls.
+	 *
+	 * @return void
+	 */
+	private function register_tab_item_style_controls() {
+		$this->start_controls_section(
+			'section_style_tab_items',
+			array(
+				'label' => __( 'Tab Item', 'devsroom-dropdown-menu' ),
+				'tab'   => Controls_Manager::TAB_STYLE,
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Typography::get_type(),
+			array(
+				'name'     => 'tab_item_typography',
+				'selector' => '{{WRAPPER}} .ddm-woo-product-tabs__tab',
+			)
+		);
+
+		$this->add_control(
+			'tab_item_text_color',
+			array(
+				'label'     => __( 'Text Color', 'devsroom-dropdown-menu' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ddm-woo-product-tabs' => '--ddm-tabs-item-text-color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'tab_item_bg_color',
+			array(
+				'label'     => __( 'Background Color', 'devsroom-dropdown-menu' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ddm-woo-product-tabs' => '--ddm-tabs-item-bg-color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Border::get_type(),
+			array(
+				'name'     => 'tab_item_border',
+				'selector' => '{{WRAPPER}} .ddm-woo-product-tabs__tab',
+			)
+		);
+
+		$this->add_responsive_control(
+			'tab_item_padding',
+			array(
+				'label'      => __( 'Padding', 'devsroom-dropdown-menu' ),
+				'type'       => Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px', 'em', '%' ),
+				'selectors'  => array(
+					'{{WRAPPER}} .ddm-woo-product-tabs__tab' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'tab_item_gap',
+			array(
+				'label'      => __( 'Gap Between Items', 'devsroom-dropdown-menu' ),
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px', 'em', 'rem' ),
+				'range'      => array(
+					'px'  => array(
+						'min' => 0,
+						'max' => 60,
+					),
+					'em'  => array(
+						'min' => 0,
+						'max' => 4,
+					),
+					'rem' => array(
+						'min' => 0,
+						'max' => 4,
+					),
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .ddm-woo-product-tabs' => '--ddm-tabs-gap: {{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->start_controls_tabs( 'tab_item_state_tabs' );
+
+		$this->start_controls_tab(
+			'tab_item_state_hover',
+			array(
+				'label' => __( 'Hover', 'devsroom-dropdown-menu' ),
+			)
+		);
+
+		$this->add_control(
+			'tab_item_hover_text_color',
+			array(
+				'label'     => __( 'Text Color', 'devsroom-dropdown-menu' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ddm-woo-product-tabs' => '--ddm-tabs-item-hover-text-color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'tab_item_hover_bg_color',
+			array(
+				'label'     => __( 'Background Color', 'devsroom-dropdown-menu' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ddm-woo-product-tabs' => '--ddm-tabs-item-hover-bg-color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'tab_item_hover_border_color',
+			array(
+				'label'     => __( 'Border Color', 'devsroom-dropdown-menu' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ddm-woo-product-tabs' => '--ddm-tabs-item-hover-border-color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->end_controls_tab();
+
+		$this->start_controls_tab(
+			'tab_item_state_active',
+			array(
+				'label' => __( 'Active', 'devsroom-dropdown-menu' ),
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Typography::get_type(),
+			array(
+				'name'     => 'tab_item_active_typography',
+				'selector' => '{{WRAPPER}} .ddm-woo-product-tabs__tab.is-active',
+			)
+		);
+
+		$this->add_control(
+			'tab_item_active_text_color',
+			array(
+				'label'     => __( 'Text Color', 'devsroom-dropdown-menu' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ddm-woo-product-tabs' => '--ddm-tabs-item-active-text-color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'tab_item_active_bg_color',
+			array(
+				'label'     => __( 'Background Color', 'devsroom-dropdown-menu' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ddm-woo-product-tabs' => '--ddm-tabs-item-active-bg-color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'tab_item_active_border_color',
+			array(
+				'label'     => __( 'Border Color', 'devsroom-dropdown-menu' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ddm-woo-product-tabs' => '--ddm-tabs-item-active-border-color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'tab_item_active_border_weight',
+			array(
+				'label'      => __( 'Active Border Weight', 'devsroom-dropdown-menu' ),
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array(
+					'px' => array(
+						'min' => 0,
+						'max' => 12,
+					),
+				),
+				'default'    => array(
+					'size' => 1,
+					'unit' => 'px',
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .ddm-woo-product-tabs' => '--ddm-tabs-active-border-weight: {{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->end_controls_tab();
+		$this->end_controls_tabs();
+
+		$this->add_responsive_control(
+			'tab_icon_size',
+			array(
+				'label'      => __( 'Icon Size', 'devsroom-dropdown-menu' ),
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px', 'em', 'rem' ),
+				'range'      => array(
+					'px'  => array(
+						'min' => 8,
+						'max' => 80,
+					),
+					'em'  => array(
+						'min' => 0.5,
+						'max' => 4,
+					),
+					'rem' => array(
+						'min' => 0.5,
+						'max' => 4,
+					),
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .ddm-woo-product-tabs' => '--ddm-tabs-icon-size: {{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'tab_icon_color',
+			array(
+				'label'     => __( 'Icon Color', 'devsroom-dropdown-menu' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ddm-woo-product-tabs' => '--ddm-tabs-icon-color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'tab_icon_active_color',
+			array(
+				'label'     => __( 'Active Icon Color', 'devsroom-dropdown-menu' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ddm-woo-product-tabs' => '--ddm-tabs-icon-active-color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'tab_icon_gap',
+			array(
+				'label'      => __( 'Icon Spacing', 'devsroom-dropdown-menu' ),
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px', 'em', 'rem' ),
+				'range'      => array(
+					'px'  => array(
+						'min' => 0,
+						'max' => 40,
+					),
+					'em'  => array(
+						'min' => 0,
+						'max' => 3,
+					),
+					'rem' => array(
+						'min' => 0,
+						'max' => 3,
+					),
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .ddm-woo-product-tabs' => '--ddm-tabs-icon-gap: {{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->end_controls_section();
+	}
+
+	/**
+	 * Registers content panel style controls.
+	 *
+	 * @return void
+	 */
+	private function register_content_style_controls() {
+		$this->start_controls_section(
+			'section_style_content_area',
+			array(
+				'label' => __( 'Tab Content Area', 'devsroom-dropdown-menu' ),
+				'tab'   => Controls_Manager::TAB_STYLE,
+			)
+		);
+
+		$this->add_control(
+			'content_bg_color',
+			array(
+				'label'     => __( 'Background Color', 'devsroom-dropdown-menu' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ddm-woo-product-tabs' => '--ddm-tabs-content-bg: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Border::get_type(),
+			array(
+				'name'     => 'content_border',
+				'selector' => '{{WRAPPER}} .ddm-woo-product-tabs__panel',
+			)
+		);
+
+		$this->add_responsive_control(
+			'content_border_radius',
+			array(
+				'label'      => __( 'Border Radius', 'devsroom-dropdown-menu' ),
+				'type'       => Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px', '%' ),
+				'selectors'  => array(
+					'{{WRAPPER}} .ddm-woo-product-tabs__panel' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'content_padding',
+			array(
+				'label'      => __( 'Padding', 'devsroom-dropdown-menu' ),
+				'type'       => Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px', 'em', '%' ),
+				'selectors'  => array(
+					'{{WRAPPER}} .ddm-woo-product-tabs__panel' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Typography::get_type(),
+			array(
+				'name'     => 'content_typography',
+				'selector' => '{{WRAPPER}} .ddm-woo-product-tabs__panel',
+			)
+		);
+
+		$this->add_control(
+			'content_text_color',
+			array(
+				'label'     => __( 'Text Color', 'devsroom-dropdown-menu' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ddm-woo-product-tabs' => '--ddm-tabs-content-text-color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->end_controls_section();
+	}
+
+	/**
 	 * Renders widget output.
 	 *
 	 * @return void
@@ -265,23 +855,34 @@ class DDM_Woo_Product_Tabs_Widget extends Widget_Base {
 	protected function render() {
 		$settings      = $this->get_settings_for_display();
 		$instance_id   = 'ddm-woo-product-tabs-' . sanitize_html_class( $this->get_id() );
-		$tabs          = $this->build_custom_tabs( $settings, $instance_id );
+		$tab_source    = $this->sanitize_tab_source( $settings['tab_source'] ?? 'custom' );
 		$use_fallback  = $this->is_switcher_enabled( $settings['enable_woo_fallback'] ?? 'yes' );
 		$product       = null;
 		$fallback_used = false;
+		$tabs          = array();
 
-		if ( empty( $tabs ) && $use_fallback ) {
+		if ( 'woocommerce_default' === $tab_source ) {
 			$product = $this->resolve_product();
 			if ( $product instanceof \WC_Product ) {
-				$tabs = $this->build_fallback_tabs( $product, $instance_id );
+				$tabs = $this->build_woocommerce_tabs( $product, $instance_id, $settings );
 			}
-			$fallback_used = ! empty( $tabs );
+		} else {
+			$tabs = $this->build_custom_tabs( $settings, $instance_id );
+			if ( empty( $tabs ) && $use_fallback ) {
+				$product = $this->resolve_product();
+				if ( $product instanceof \WC_Product ) {
+					$tabs = $this->build_woocommerce_tabs( $product, $instance_id, $settings );
+				}
+				$fallback_used = ! empty( $tabs );
+			}
 		}
 
 		if ( empty( $tabs ) ) {
 			if ( $this->is_edit_mode() ) {
 				echo '<div class="ddm-woo-product-tabs__notice">';
-				if ( $use_fallback ) {
+				if ( 'woocommerce_default' === $tab_source ) {
+					echo esc_html__( 'No WooCommerce default tabs are available for the current product/context.', 'devsroom-dropdown-menu' );
+				} elseif ( $use_fallback ) {
 					echo esc_html__( 'No product tabs available. Add custom tabs, or use this widget on a WooCommerce single product template.', 'devsroom-dropdown-menu' );
 				} else {
 					echo esc_html__( 'No custom tabs added. Add items in "Tabs Items" or enable WooCommerce fallback.', 'devsroom-dropdown-menu' );
@@ -295,6 +896,9 @@ class DDM_Woo_Product_Tabs_Widget extends Widget_Base {
 		$content_mode       = $this->sanitize_width_mode( $settings['tabs_content_width_mode'] ?? 'full_width' );
 		$panel_custom_width = 'custom' === $panel_mode ? $this->get_custom_width_css_value( $settings['tabs_panel_custom_width'] ?? array() ) : '';
 		$content_custom     = 'custom' === $content_mode ? $this->get_custom_width_css_value( $settings['tabs_content_custom_width'] ?? array() ) : '';
+		$panel_sticky       = $this->is_switcher_enabled( $settings['tabs_panel_sticky_enable'] ?? '' );
+		$sticky_position    = $this->sanitize_sticky_position( $settings['tabs_panel_sticky_position'] ?? 'top' );
+		$sticky_offset      = $this->get_sticky_offset_value( $settings['tabs_panel_sticky_offset'] ?? array() );
 
 		$panel_inner_classes = array( 'ddm-woo-product-tabs__panel-inner' );
 		if ( 'container' === $panel_mode ) {
@@ -309,9 +913,10 @@ class DDM_Woo_Product_Tabs_Widget extends Widget_Base {
 		$this->add_render_attribute(
 			'root',
 			array(
-				'id'          => $instance_id,
-				'class'       => 'ddm-woo-product-tabs',
-				'data-source' => $fallback_used ? 'woocommerce' : 'custom',
+				'id'              => $instance_id,
+				'class'           => 'ddm-woo-product-tabs',
+				'data-source'     => ( 'woocommerce_default' === $tab_source || $fallback_used ) ? 'woocommerce' : 'custom',
+				'data-tab-source' => $tab_source,
 			)
 		);
 
@@ -325,8 +930,17 @@ class DDM_Woo_Product_Tabs_Widget extends Widget_Base {
 					'ddm-woo-product-tabs__panel-wrap',
 					'panel-' . $panel_class_suffix,
 				),
+				'data-sticky-enabled'  => $panel_sticky ? 'yes' : 'no',
+				'data-sticky-position' => $sticky_position,
+				'data-sticky-offset'   => (string) $sticky_offset,
 			)
 		);
+
+		if ( $panel_sticky ) {
+			$this->add_render_attribute( 'panel_wrap', 'class', 'panel-sticky' );
+			$this->add_render_attribute( 'panel_wrap', 'class', 'panel-sticky-' . $sticky_position );
+			$this->add_render_attribute( 'panel_wrap', 'style', '--ddm-tabs-panel-sticky-offset:' . $sticky_offset . 'px;' );
+		}
 
 		$this->add_render_attribute(
 			'panel_inner',
@@ -458,19 +1072,26 @@ class DDM_Woo_Product_Tabs_Widget extends Widget_Base {
 	}
 
 	/**
-	 * Builds fallback tabs from native WooCommerce tabs.
+	 * Builds WooCommerce tabs from native callbacks with settings filtering.
 	 *
 	 * @param \WC_Product $product     Product object.
 	 * @param string      $instance_id Widget instance ID.
+	 * @param array       $settings    Widget settings.
 	 * @return array<int,array<string,mixed>>
 	 */
-	private function build_fallback_tabs( \WC_Product $product, $instance_id ) {
+	private function build_woocommerce_tabs( \WC_Product $product, $instance_id, $settings ) {
 		$allowed_keys = array( 'description', 'additional_information', 'reviews' );
+		$enabled_keys = $this->get_enabled_wc_tab_keys_from_settings( $settings );
 		$tabs_data    = $this->get_woocommerce_tabs_data( $product );
+		$tabs_data    = $this->apply_wc_tab_filters( $tabs_data, $enabled_keys );
 		$tabs         = array();
 		$index        = 0;
 
 		foreach ( $allowed_keys as $tab_key ) {
+			if ( ! in_array( $tab_key, $enabled_keys, true ) ) {
+				continue;
+			}
+
 			if ( empty( $tabs_data[ $tab_key ] ) || ! is_array( $tabs_data[ $tab_key ] ) ) {
 				continue;
 			}
@@ -505,6 +1126,57 @@ class DDM_Woo_Product_Tabs_Widget extends Widget_Base {
 		}
 
 		return $tabs;
+	}
+
+	/**
+	 * Returns enabled default WooCommerce tab keys from control settings.
+	 *
+	 * @param array $settings Widget settings.
+	 * @return string[]
+	 */
+	private function get_enabled_wc_tab_keys_from_settings( $settings ) {
+		$enabled = array();
+
+		$description_enabled = isset( $settings['wc_tab_description_enable'] ) ? $this->is_switcher_enabled( $settings['wc_tab_description_enable'] ) : true;
+		$additional_enabled  = isset( $settings['wc_tab_additional_info_enable'] ) ? $this->is_switcher_enabled( $settings['wc_tab_additional_info_enable'] ) : true;
+		$reviews_enabled     = isset( $settings['wc_tab_reviews_enable'] ) ? $this->is_switcher_enabled( $settings['wc_tab_reviews_enable'] ) : true;
+
+		if ( $description_enabled ) {
+			$enabled[] = 'description';
+		}
+
+		if ( $additional_enabled ) {
+			$enabled[] = 'additional_information';
+		}
+
+		if ( $reviews_enabled ) {
+			$enabled[] = 'reviews';
+		}
+
+		return $enabled;
+	}
+
+	/**
+	 * Filters WooCommerce tab definitions by enabled keys.
+	 *
+	 * @param array $tabs_data     WooCommerce tab definitions.
+	 * @param array $enabled_keys  Enabled tab keys.
+	 * @return array<string,array<string,mixed>>
+	 */
+	private function apply_wc_tab_filters( $tabs_data, $enabled_keys ) {
+		if ( ! is_array( $tabs_data ) || empty( $enabled_keys ) ) {
+			return array();
+		}
+
+		$filtered = array();
+
+		foreach ( $enabled_keys as $enabled_key ) {
+			if ( isset( $tabs_data[ $enabled_key ] ) && is_array( $tabs_data[ $enabled_key ] ) ) {
+				$filtered[ $enabled_key ] = $tabs_data[ $enabled_key ];
+			}
+		}
+
+		return $filtered;
 	}
 
 	/**
@@ -589,6 +1261,17 @@ class DDM_Woo_Product_Tabs_Widget extends Widget_Base {
 	}
 
 	/**
+	 * Sanitizes tab source mode.
+	 *
+	 * @param string $source Raw source value.
+	 * @return string
+	 */
+	private function sanitize_tab_source( $source ) {
+		$source = is_string( $source ) ? trim( $source ) : 'custom';
+		return in_array( $source, array( 'woocommerce_default', 'custom' ), true ) ? $source : 'custom';
+	}
+
+	/**
 	 * Maps layout mode to the required wrapper class suffix.
 	 *
 	 * @param string $mode Sanitized mode.
@@ -600,6 +1283,45 @@ class DDM_Woo_Product_Tabs_Widget extends Widget_Base {
 		}
 
 		return $mode;
+	}
+
+	/**
+	 * Sanitizes sticky position setting.
+	 *
+	 * @param string $position Sticky position.
+	 * @return string
+	 */
+	private function sanitize_sticky_position( $position ) {
+		$position = is_string( $position ) ? trim( $position ) : 'top';
+		return in_array( $position, array( 'top', 'bottom' ), true ) ? $position : 'top';
+	}
+
+	/**
+	 * Returns sticky offset value in pixels.
+	 *
+	 * @param mixed $offset_setting Sticky offset setting.
+	 * @return int
+	 */
+	private function get_sticky_offset_value( $offset_setting ) {
+		if ( ! is_array( $offset_setting ) ) {
+			return 0;
+		}
+
+		$size = $offset_setting['size'] ?? 0;
+		if ( ! is_numeric( $size ) ) {
+			return 0;
+		}
+
+		$size = (int) round( (float) $size );
+		if ( $size < 0 ) {
+			return 0;
+		}
+
+		if ( $size > 300 ) {
+			return 300;
+		}
+
+		return $size;
 	}
 
 	/**

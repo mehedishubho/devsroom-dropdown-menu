@@ -3,7 +3,7 @@ Contributors: devsroom
 Requires at least: 6.4
 Tested up to: 6.6
 Requires PHP: 8.0
-Stable tag: 1.0.0
+Stable tag: 1.4.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Tags: elementor, dropdown, menu, hamburger, navigation
@@ -45,6 +45,17 @@ Yes. Elementor must be installed and activated.
 Version 1 supports a single-level dropdown menu.
 
 == Changelog ==
+
+= 1.4.1 =
+* Performance optimizations with enhanced asset loading and reduced memory footprint
+* Improved code quality with better documentation and refactoring
+* Bug fixes for dropdown menu icon rendering and mobile positioning
+* Fixed WooCommerce product image widget thumbnail slider in RTL layouts
+* Resolved product tabs widget keyboard navigation and ARIA attributes
+* Fixed advanced product actions widget quantity validation and redirect timing
+* Enhanced user experience with better error handling and smoother animations
+* WordPress 6.6, Elementor 3.20+, and WooCommerce 8.5+ compatibility
+* Security hardening with improved input sanitization
 
 = 1.0.0 =
 * Initial release.
