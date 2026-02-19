@@ -340,6 +340,52 @@ class DDM_Woo_Product_Tabs_Widget extends Widget_Base
 			)
 		);
 
+		$this->add_control(
+			'tabs_panel_mobile_display_mode',
+			array(
+				'label'     => __('Mobile Display Mode', 'devsroom-dropdown-menu'),
+				'type'      => Controls_Manager::SELECT,
+				'options'   => array(
+					'wrap'  => __('Wrap (Multiple Lines)', 'devsroom-dropdown-menu'),
+					'slide' => __('Slide (Horizontal Scroll)', 'devsroom-dropdown-menu'),
+				),
+				'default'   => 'wrap',
+				'separator' => 'before',
+			)
+		);
+
+		$this->add_control(
+			'tabs_panel_mobile_slide_arrows',
+			array(
+				'label'        => __('Show Navigation Arrows', 'devsroom-dropdown-menu'),
+				'type'         => Controls_Manager::SWITCHER,
+				'label_on'     => __('Yes', 'devsroom-dropdown-menu'),
+				'label_off'    => __('No', 'devsroom-dropdown-menu'),
+				'return_value' => 'yes',
+				'default'      => 'yes',
+				'condition'    => array(
+					'tabs_panel_mobile_display_mode' => 'slide',
+				),
+			)
+		);
+
+		$this->add_control(
+			'tabs_panel_mobile_arrows_position',
+			array(
+				'label'     => __('Arrows Position', 'devsroom-dropdown-menu'),
+				'type'      => Controls_Manager::SELECT,
+				'options'   => array(
+					'outside' => __('Outside', 'devsroom-dropdown-menu'),
+					'inside'  => __('Inside', 'devsroom-dropdown-menu'),
+				),
+				'default'   => 'outside',
+				'condition' => array(
+					'tabs_panel_mobile_display_mode' => 'slide',
+					'tabs_panel_mobile_slide_arrows' => 'yes',
+				),
+			)
+		);
+
 		$this->end_controls_section();
 	}
 
@@ -927,6 +973,9 @@ class DDM_Woo_Product_Tabs_Widget extends Widget_Base
 		$panel_sticky       = $this->is_switcher_enabled($settings['tabs_panel_sticky_enable'] ?? '');
 		$sticky_position    = $this->sanitize_sticky_position($settings['tabs_panel_sticky_position'] ?? 'top');
 		$sticky_offset      = $this->get_sticky_offset_value($settings['tabs_panel_sticky_offset'] ?? array());
+		$mobile_display_mode = $this->sanitize_mobile_display_mode($settings['tabs_panel_mobile_display_mode'] ?? 'wrap');
+		$mobile_slide_arrows = $this->is_switcher_enabled($settings['tabs_panel_mobile_slide_arrows'] ?? 'yes');
+		$mobile_arrows_position = $this->sanitize_arrows_position($settings['tabs_panel_mobile_arrows_position'] ?? 'outside');
 
 		$panel_inner_classes = array('ddm-woo-product-tabs__panel-inner');
 		if ('container' === $panel_mode) {
@@ -961,6 +1010,9 @@ class DDM_Woo_Product_Tabs_Widget extends Widget_Base
 				'data-sticky-enabled'  => $panel_sticky ? 'yes' : 'no',
 				'data-sticky-position' => $sticky_position,
 				'data-sticky-offset'   => (string) $sticky_offset,
+				'data-mobile-display-mode' => $mobile_display_mode,
+				'data-mobile-slide-arrows' => $mobile_slide_arrows ? 'yes' : 'no',
+				'data-mobile-arrows-position' => $mobile_arrows_position,
 			)
 		);
 
@@ -1012,7 +1064,21 @@ class DDM_Woo_Product_Tabs_Widget extends Widget_Base
 		echo '<div ' . $this->get_render_attribute_string('root') . '>';
 		echo '<div ' . $this->get_render_attribute_string('panel_wrap') . '>';
 		echo '<div ' . $this->get_render_attribute_string('panel_inner') . '>';
-		echo '<div class="ddm-woo-product-tabs__nav" role="tablist" aria-label="' . esc_attr__('Product tabs', 'devsroom-dropdown-menu') . '">';
+
+		// Mobile slider arrows container (outside position)
+		if ('slide' === $mobile_display_mode && $mobile_slide_arrows && 'outside' === $mobile_arrows_position) {
+			echo '<div class="ddm-woo-product-tabs__slider-arrows ddm-slider-arrows-outside">';
+			echo '<button type="button" class="ddm-woo-product-tabs__slider-arrow ddm-slider-arrow-prev" aria-label="' . esc_attr__('Previous tabs', 'devsroom-dropdown-menu') . '"><span class="ddm-arrow-icon">‹</span></button>';
+			echo '<button type="button" class="ddm-woo-product-tabs__slider-arrow ddm-slider-arrow-next" aria-label="' . esc_attr__('Next tabs', 'devsroom-dropdown-menu') . '"><span class="ddm-arrow-icon">›</span></button>';
+			echo '</div>';
+		}
+
+		echo '<div class="ddm-woo-product-tabs__nav ddm-nav-' . esc_attr($mobile_display_mode) . '" role="tablist" aria-label="' . esc_attr__('Product tabs', 'devsroom-dropdown-menu') . '">';
+
+		// Mobile slider arrows (inside position - before tabs)
+		if ('slide' === $mobile_display_mode && $mobile_slide_arrows && 'inside' === $mobile_arrows_position) {
+			echo '<button type="button" class="ddm-woo-product-tabs__slider-arrow ddm-slider-arrow-prev ddm-slider-arrow-inside" aria-label="' . esc_attr__('Previous tabs', 'devsroom-dropdown-menu') . '"><span class="ddm-arrow-icon">‹</span></button>';
+		}
 
 		foreach ($tabs as $index => $tab) {
 			$is_active = 0 === $index;
@@ -1022,6 +1088,11 @@ class DDM_Woo_Product_Tabs_Widget extends Widget_Base
 			echo $this->render_tab_icon($tab['icon'], $tab['icon_legacy'] ?? '', 'ddm-woo-product-tabs__tab-icon'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			echo '<span class="ddm-woo-product-tabs__tab-label">' . esc_html($tab['title']) . '</span>';
 			echo '</button>';
+		}
+
+		// Mobile slider arrows (inside position - after tabs)
+		if ('slide' === $mobile_display_mode && $mobile_slide_arrows && 'inside' === $mobile_arrows_position) {
+			echo '<button type="button" class="ddm-woo-product-tabs__slider-arrow ddm-slider-arrow-next ddm-slider-arrow-inside" aria-label="' . esc_attr__('Next tabs', 'devsroom-dropdown-menu') . '"><span class="ddm-arrow-icon">›</span></button>';
 		}
 
 		echo '</div>';
@@ -1341,6 +1412,30 @@ class DDM_Woo_Product_Tabs_Widget extends Widget_Base
 	{
 		$position = is_string($position) ? trim($position) : 'top';
 		return in_array($position, array('top', 'bottom'), true) ? $position : 'top';
+	}
+
+	/**
+	 * Sanitizes mobile display mode setting.
+	 *
+	 * @param string $mode Mobile display mode.
+	 * @return string
+	 */
+	private function sanitize_mobile_display_mode($mode)
+	{
+		$mode = is_string($mode) ? trim($mode) : 'wrap';
+		return in_array($mode, array('wrap', 'slide'), true) ? $mode : 'wrap';
+	}
+
+	/**
+	 * Sanitizes arrows position setting.
+	 *
+	 * @param string $position Arrows position.
+	 * @return string
+	 */
+	private function sanitize_arrows_position($position)
+	{
+		$position = is_string($position) ? trim($position) : 'outside';
+		return in_array($position, array('outside', 'inside'), true) ? $position : 'outside';
 	}
 
 	/**

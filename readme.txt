@@ -26,16 +26,18 @@ Features include:
 * Admin-only custom JavaScript execution support
 * Keyboard navigation and ARIA attributes
 * Improved icon rendering compatibility for Elementor icon payloads
-* **WooCommerce Product Tabs Widget**:
-  - Display all WooCommerce default tabs (Description, Additional Information, Reviews)
-  - Support for third-party tab plugins automatically
-  - Custom tab builder with WYSIWYG content editor
-  - Flexible layout options (Full Width, Container, Custom)
-  - Sticky navigation with configurable position (top/bottom) and offset
-  - Icon support for each tab
-  - Comprehensive styling controls for all states (Normal, Hover, Active)
-  - Tab item text color and background color styling (FIXED)
-  - Full keyboard navigation and accessibility support
+ * **WooCommerce Product Tabs Widget**:
+   - Display all WooCommerce default tabs (Description, Additional Information, Reviews)
+   - Support for third-party tab plugins automatically
+   - Custom tab builder with WYSIWYG content editor
+   - Flexible layout options (Full Width, Container, Custom)
+   - Sticky navigation with configurable position (top/bottom) and offset
+   - Icon support for each tab
+   - Comprehensive styling controls for all states (Normal, Hover, Active)
+   - Tab item text color and background color styling (FIXED)
+   - Full keyboard navigation and accessibility support
+   - **NEW**: Mobile display mode with Wrap (multiple lines) or Slide (horizontal scroll) options
+   - **NEW**: Navigation arrows for slide mode with Outside/Inside position options
 * **WooCommerce Product Image Widget**:
   - Product gallery display with configurable thumbnails
   - Multiple thumbnail positions (Bottom, Top, Left, Right)
@@ -96,6 +98,8 @@ Yes! Version 1.4.3 includes fixed tab item styling controls with direct selector
 * Improved keyboard navigation and accessibility support
 * Added border color controls for hover and active states
 * Enhanced icon styling with separate normal/active color controls
+* **NEW**: Mobile display mode with Wrap (multiple lines) or Slide (horizontal scroll) options
+* **NEW**: Navigation arrows for slide mode with Outside/Inside position options
 * WordPress 6.6, Elementor 3.20+, and WooCommerce 8.5+ compatibility
 
 = 1.4.1 =

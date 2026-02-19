@@ -2,13 +2,13 @@
 
 **Release Date:** February 19, 2026
 **Version:** 1.4.3
-**Type:** Critical Bug Fix
+**Type:** Critical Bug Fix & Feature Update
 
 ---
 
 ## 📋 Overview
 
-Version 1.4.3 is a critical bug fix release that addresses important issues with the WooCommerce Product Tabs widget. This release fixes tab item styling controls that were not working correctly and enhances third-party tab plugin compatibility.
+Version 1.4.3 is a critical bug fix release that addresses important issues with WooCommerce Product Tabs widget. This release fixes tab item styling controls that were not working correctly, enhances third-party tab plugin compatibility, and adds new mobile display mode options for better handling of products with many tabs.
 
 ---
 
@@ -16,11 +16,11 @@ Version 1.4.3 is a critical bug fix release that addresses important issues with
 
 ### WooCommerce Product Tabs Widget - Tab Item Styling
 
-**Problem:** Tab item text color and background color controls in the Elementor editor were not applying to the frontend tabs. Users were unable to customize tab button colors for normal, hover, and active states.
+**Problem:** Tab item text color and background color controls in Elementor editor were not applying to frontend tabs. Users were unable to customize tab button colors for normal, hover, and active states.
 
 **Solution:**
 
-- Updated all tab item style selectors to match the HTML structure exactly
+- Updated all tab item style selectors to match HTML structure exactly
 - Changed from CSS variable approach to direct selectors (`{{WRAPPER}} .ddm-woo-product-tabs__tab`)
 - Fixed selectors for all three states:
   - Normal: `{{WRAPPER}} .ddm-woo-product-tabs__tab`
@@ -65,7 +65,7 @@ Version 1.4.3 is a critical bug fix release that addresses important issues with
 
 - Uses `apply_filters('woocommerce_product_tabs', array())` to retrieve all registered tabs
 - Third-party tabs are automatically included when using "WooCommerce Default" source mode
-- Maintains priority and sorting from the WooCommerce tabs filter
+- Maintains priority and sorting from WooCommerce tabs filter
 - Full compatibility with popular tab plugins (YITH, Tab Manager, etc.)
 
 **Benefits:**
@@ -74,6 +74,47 @@ Version 1.4.3 is a critical bug fix release that addresses important issues with
 - Automatic inclusion of all registered tabs
 - Maintains tab order and priority from source plugins
 - Works seamlessly with custom styling controls
+
+### Mobile Display Mode
+
+**Feature:** New control to choose how tabs display on mobile devices when there are many tab items.
+
+**Implementation:**
+
+- Added "Mobile Display Mode" control in Panel Layout section
+- Two display options:
+  - **Wrap Mode (Default)**: Tabs wrap to multiple lines on mobile
+  - **Slide Mode**: Tabs scroll horizontally with navigation arrows
+- Responsive behavior activates on mobile devices (max-width: 767px)
+- Smooth scrolling behavior for slide mode
+
+**Benefits:**
+
+- Better handling of products with many tabs
+- Cleaner mobile interface
+- User choice between wrap and scroll behavior
+- Improved touch scrolling on mobile devices
+
+### Navigation Arrows for Slide Mode
+
+**Feature:** Optional navigation arrows for horizontal scroll mode with position controls.
+
+**Implementation:**
+
+- "Show Navigation Arrows" toggle (only visible in slide mode)
+- "Arrows Position" selector with options:
+  - **Outside**: Arrows appear on left/right edges of the tab bar
+  - **Inside**: Arrows appear within the tab bar (before first/after last tab)
+- Smooth 200px scroll per click
+- Auto-disable arrows when at start/end of scroll
+- Keyboard support (Enter/Space) for arrow buttons
+
+**Benefits:**
+
+- Easy navigation through many tabs on mobile
+- Flexible positioning options
+- Visual feedback when scrolling is available
+- Accessible arrow controls
 
 ---
 
@@ -140,6 +181,9 @@ Version 1.4.3 is a critical bug fix release that addresses important issues with
    - Updated tab item style selectors (lines 509-688)
    - Enhanced WooCommerce tab fetching to support third-party tabs (lines 1182-1225)
    - Improved tab filtering logic (lines 1166-1180)
+   - Added mobile display mode controls (lines 343-387)
+   - Added mobile display mode sanitization methods (lines 1393-1414)
+   - Updated render method to support mobile display modes (lines 969-1090)
 
 2. **`assets/css/ddm-woo-product-tabs.css`**
    - Removed CSS variable approach
@@ -147,12 +191,16 @@ Version 1.4.3 is a critical bug fix release that addresses important issues with
    - Enhanced hover and active state styling
    - Improved sticky navigation styles
    - Added responsive and accessibility improvements
+   - Added mobile display mode styles (wrap and slide)
+   - Added navigation arrow styles (outside and inside positions)
 
 3. **`assets/js/ddm-woo-product-tabs.js`**
    - Optimized sticky navigation with requestAnimationFrame
    - Enhanced event listener cleanup
    - Improved keyboard navigation
    - Added performance optimizations
+   - Added slider navigation functionality for mobile slide mode
+   - Added arrow button state management
 
 4. **`devsroom-dropdown-menu.php`**
    - Updated version constant to 1.4.3
@@ -176,10 +224,11 @@ Version 1.4.3 is a critical bug fix release that addresses important issues with
 
 **Recommended Actions:**
 
-1. Update the plugin to version 1.4.3
+1. Update plugin to version 1.4.3
 2. Review your Product Tabs widgets in Elementor
 3. Re-apply any tab item color styles that weren't working before
 4. Test with third-party tab plugins if you use them
+5. Try the new mobile display mode options for products with many tabs
 
 **What to Expect:**
 
@@ -187,10 +236,11 @@ Version 1.4.3 is a critical bug fix release that addresses important issues with
 - Third-party tabs appear automatically when using WooCommerce Default source
 - Sticky navigation is smoother and more performant
 - Better accessibility and keyboard navigation
+- New mobile display mode options for better tab handling on small screens
 
 ### For New Users
 
-Simply install and activate the plugin. The Product Tabs widget will work correctly with all styling controls.
+Simply install and activate plugin. The Product Tabs widget will work correctly with all styling controls and new mobile display features.
 
 ---
 
@@ -216,6 +266,13 @@ Before deploying to production, test the following:
 - [ ] URL hash updates when switching tabs
 - [ ] Tab content displays correctly
 - [ ] Responsive design works on mobile devices
+- [ ] Mobile display mode "Wrap" works correctly
+- [ ] Mobile display mode "Slide" works correctly
+- [ ] Navigation arrows appear in slide mode
+- [ ] Navigation arrows work correctly (prev/next)
+- [ ] Arrows position "Outside" works correctly
+- [ ] Arrows position "Inside" works correctly
+- [ ] Arrows disable when at scroll start/end
 
 ### General
 
@@ -237,6 +294,7 @@ Special thanks to the following:
 - **Users who reported tab item styling issues** - Your detailed reports helped us identify the root cause
 - **Users testing third-party tab plugins** - Your feedback ensured full compatibility
 - **Community feedback** - Your input continues to help us improve the plugin
+- **Users requesting mobile display improvements** - Your feedback led to the new wrap/slide mode feature
 
 ---
 
@@ -244,7 +302,7 @@ Special thanks to the following:
 
 If you encounter any issues with this release:
 
-1. **Check the documentation** - Review the readme.txt and widget controls
+1. **Check documentation** - Review readme.txt and widget controls
 2. **Clear your cache** - Clear browser, server, and caching plugin caches
 3. **Test in a staging environment** - Always test updates before deploying to production
 4. **Report issues** - Provide detailed information including:

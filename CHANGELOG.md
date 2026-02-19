@@ -18,6 +18,14 @@ This release addresses critical issues with the WooCommerce Product Tabs widget,
   - Normal state styling (text color, background color, border)
   - Hover state styling (text color, background color, border color)
   - Active state styling (text color, background color, border color, border weight)
+- **Mobile Display Mode**: New control to choose how tabs display on mobile devices:
+  - **Wrap Mode**: Tabs wrap to multiple lines (default)
+  - **Slide Mode**: Tabs scroll horizontally with navigation arrows
+- **Navigation Arrows**: For slide mode, optional navigation arrows with:
+  - Show/hide toggle
+  - Position options: Outside (on edges) or Inside (within tab bar)
+  - Smooth scrolling behavior
+  - Auto-disable when at start/end
 
 ### 🐛 Bug Fixes
 

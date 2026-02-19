@@ -1,6 +1,6 @@
 /**
  * Devsroom WooCommerce Product Tabs Widget JavaScript
- * Production-ready with tab switching, sticky navigation, and accessibility
+ * Production-ready with tab switching, sticky navigation, slider, and accessibility
  */
 
 (function () {
@@ -9,6 +9,7 @@
 	// Widget Selectors
 	var WIDGET_SELECTOR = '.ddm-woo-product-tabs';
 	var PANEL_WRAP_SELECTOR = '.ddm-woo-product-tabs__panel-wrap';
+	var NAV_SELECTOR = '.ddm-woo-product-tabs__nav';
 	var TAB_SELECTOR = '.ddm-woo-product-tabs__tab[role="tab"]';
 	var PANEL_SELECTOR = '.ddm-woo-product-tabs__panel[role="tabpanel"]';
 
@@ -28,7 +29,7 @@
 	}
 
 	/**
-	 * Get current URL hash without the # symbol
+	 * Get current URL hash without # symbol
 	 */
 	function getHashId() {
 		if (!window.location.hash) {
@@ -119,6 +120,130 @@
 	}
 
 	/**
+	 * Initialize slider navigation for mobile slide mode
+	 */
+	function initSliderNavigation(root, nav) {
+		if (!nav || nav.dataset.sliderInit === 'yes') {
+			return null;
+		}
+
+		var panelWrap = root.querySelector(PANEL_WRAP_SELECTOR);
+		if (!panelWrap) {
+			return null;
+		}
+
+		var mobileDisplayMode = panelWrap.dataset.mobileDisplayMode || 'wrap';
+		var mobileSlideArrows = panelWrap.dataset.mobileSlideArrows === 'yes';
+		var arrowsPosition = panelWrap.dataset.mobileArrowsPosition || 'outside';
+
+		// Only initialize for slide mode with arrows enabled
+		if (mobileDisplayMode !== 'slide' || !mobileSlideArrows) {
+			return null;
+		}
+
+		nav.dataset.sliderInit = 'yes';
+
+		// Find arrow buttons
+		var prevArrow = root.querySelector('.ddm-slider-arrow-prev');
+		var nextArrow = root.querySelector('.ddm-slider-arrow-next');
+
+		if (!prevArrow || !nextArrow) {
+			return null;
+		}
+
+		var rafId = 0;
+		var scrollAmount = 200; // Pixels to scroll per click
+
+		/**
+		 * Update arrow button states based on scroll position
+		 */
+		function updateArrowStates() {
+			rafId = 0;
+
+			if (!nav.isConnected) {
+				return;
+			}
+
+			var scrollLeft = nav.scrollLeft;
+			var scrollWidth = nav.scrollWidth;
+			var clientWidth = nav.clientWidth;
+			var maxScroll = scrollWidth - clientWidth;
+
+			// Disable prev arrow if at start
+			prevArrow.disabled = scrollLeft <= 1;
+
+			// Disable next arrow if at end
+			nextArrow.disabled = scrollLeft >= maxScroll - 1;
+		}
+
+		/**
+		 * Schedule arrow state update
+		 */
+		function scheduleArrowStateUpdate() {
+			if (rafId) {
+				return;
+			}
+
+			rafId = window.requestAnimationFrame(updateArrowStates);
+		}
+
+		/**
+		 * Scroll navigation
+		 */
+		function scrollNav(direction) {
+			var targetScroll = nav.scrollLeft + (direction * scrollAmount);
+			nav.scrollTo({
+				left: targetScroll,
+				behavior: 'smooth'
+			});
+		}
+
+		// Add event listeners to arrows
+		prevArrow.addEventListener('click', function (event) {
+			event.preventDefault();
+			scrollNav(-1);
+		});
+
+		nextArrow.addEventListener('click', function (event) {
+			event.preventDefault();
+			scrollNav(1);
+		});
+
+		// Add keyboard support for arrows
+		prevArrow.addEventListener('keydown', function (event) {
+			if (event.key === 'Enter' || event.key === ' ') {
+				event.preventDefault();
+				scrollNav(-1);
+			}
+		});
+
+		nextArrow.addEventListener('keydown', function (event) {
+			if (event.key === 'Enter' || event.key === ' ') {
+				event.preventDefault();
+				scrollNav(1);
+			}
+		});
+
+		// Update arrow states on scroll
+		nav.addEventListener('scroll', scheduleArrowStateUpdate, { passive: true });
+
+		// Update arrow states on resize
+		window.addEventListener('resize', scheduleArrowStateUpdate);
+
+		// Initial arrow state update
+		scheduleArrowStateUpdate();
+
+		// Cleanup function
+		return function cleanup() {
+			nav.removeEventListener('scroll', scheduleArrowStateUpdate);
+			window.removeEventListener('resize', scheduleArrowStateUpdate);
+			if (rafId) {
+				window.cancelAnimationFrame(rafId);
+			}
+		};
+	}
+
+	/**
 	 * Initialize sticky navigation state
 	 * Uses requestAnimationFrame for performance
 	 */
@@ -150,12 +275,12 @@
 			var wasSticky = isSticky;
 
 			if (stickyPosition === 'top') {
-				// Top sticky: check if panel has reached the top offset
+				// Top sticky: check if panel has reached top offset
 				var reachedTop = wrapRect.top <= stickyOffset + threshold;
 				var withinBoundsTop = rootRect.bottom > stickyOffset + wrapHeight;
 				isSticky = reachedTop && withinBoundsTop;
 			} else {
-				// Bottom sticky: check if panel has reached the bottom offset
+				// Bottom sticky: check if panel has reached bottom offset
 				var viewportBottomLine = window.innerHeight - stickyOffset;
 				var reachedBottom = wrapRect.bottom >= viewportBottomLine - threshold;
 				var withinTopLimit = rootRect.top < viewportBottomLine - wrapHeight;
@@ -209,6 +334,7 @@
 
 		var tabs = toArray(root.querySelectorAll(TAB_SELECTOR));
 		var panels = toArray(root.querySelectorAll(PANEL_SELECTOR));
+		var nav = root.querySelector(NAV_SELECTOR);
 		var panelWrap = root.querySelector(PANEL_WRAP_SELECTOR);
 
 		if (!tabs.length || !panels.length) {
@@ -293,10 +419,16 @@
 			activateTab(root, tabs, panels, matchingTab, false);
 		});
 
+		// Initialize slider navigation
+		var sliderCleanup = initSliderNavigation(root, nav);
+
 		// Initialize sticky state
 		var stickyCleanup = initStickyState(root, panelWrap);
 
-		// Store cleanup function on root element
+		// Store cleanup functions on root element
+		if (sliderCleanup) {
+			root._ddmSliderCleanup = sliderCleanup;
+		}
 		if (stickyCleanup) {
 			root._ddmStickyCleanup = stickyCleanup;
 		}
@@ -311,7 +443,7 @@
 	}
 
 	/**
-	 * Bootstrap the widget
+	 * Bootstrap widget
 	 */
 	function bootstrap() {
 		// Initialize on page load
@@ -329,6 +461,9 @@
 		window.addEventListener('beforeunload', function () {
 			var nodes = document.querySelectorAll(WIDGET_SELECTOR);
 			toArray(nodes).forEach(function (node) {
+				if (node._ddmSliderCleanup) {
+					node._ddmSliderCleanup();
+				}
 				if (node._ddmStickyCleanup) {
 					node._ddmStickyCleanup();
 				}
